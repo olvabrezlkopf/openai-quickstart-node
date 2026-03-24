@@ -72,7 +72,31 @@ CREATE TABLE IF NOT EXISTS signals (
     technical_data TEXT,
     sentiment_score REAL,
     status TEXT DEFAULT 'pending',
-    rejection_reason TEXT
+    rejection_reason TEXT,
+    trade_id TEXT
+)
+"""
+
+SENTIMENT_SCORES_TABLE = """
+CREATE TABLE IF NOT EXISTS sentiment_scores (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp TEXT NOT NULL,
+    asset TEXT NOT NULL,
+    score REAL NOT NULL,
+    source TEXT DEFAULT 'combined'
+)
+"""
+
+OPTIMIZER_RUNS_TABLE = """
+CREATE TABLE IF NOT EXISTS optimizer_runs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp TEXT NOT NULL,
+    trade_count INTEGER,
+    win_rate REAL,
+    profit_factor REAL,
+    sharpe REAL,
+    old_params TEXT,
+    new_params TEXT
 )
 """
 
@@ -91,4 +115,6 @@ ALL_TABLES = [
     CONFIG_HISTORY_TABLE,
     SIGNALS_TABLE,
     SYSTEM_STATE_TABLE,
+    SENTIMENT_SCORES_TABLE,
+    OPTIMIZER_RUNS_TABLE,
 ]

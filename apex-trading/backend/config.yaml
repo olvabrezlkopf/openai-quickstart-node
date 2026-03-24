@@ -1,0 +1,45 @@
+trading:
+  max_leverage: 5
+  max_positions: 3
+  max_position_pct: 0.10
+  min_cash_reserve_pct: 0.20
+  max_daily_loss_pct: 0.08
+  signal_confidence_threshold: 0.65
+  cooldown_minutes: 15
+  stop_loss_pct: 0.03
+  take_profit_ratio: 2.0
+
+agents:
+  market_analyst_interval_sec: 30
+  sentiment_interval_min: 5
+  optimizer_interval_hours: 2
+  watchdog_interval_sec: 60
+
+llm:
+  team_leader_model: "claude-haiku-4-5-20251001"
+  debate_models:
+    - provider: "anthropic"
+      model: "claude-haiku-4-5-20251001"
+    - provider: "openai"
+      model: "gpt-4o-mini"
+    - provider: "openrouter"
+      model: "mistralai/mistral-7b-instruct"
+    - provider: "google"
+      model: "gemini-2.0-flash"
+  max_tokens_per_decision: 500
+
+hyperliquid:
+  testnet: true
+  api_wallet_address: ""
+  websocket_url: "wss://api.hyperliquid.xyz/ws"
+  rest_url: "https://api.hyperliquid.xyz"
+
+telegram:
+  daily_report_time: "20:00"
+  alert_on_loss_pct: 0.05
+
+tax:
+  country: "DE"
+  freigrenze_eur: 1000
+  tax_rate: 0.26375
+  export_path: "./exports/"

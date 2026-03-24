@@ -1,0 +1,31 @@
+[Unit]
+Description=APEX Trading System — Watchdog (process supervisor)
+After=network.target apex-backend.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=apex
+Group=apex
+WorkingDirectory=/opt/apex-trading/backend
+EnvironmentFile=/opt/apex-trading/backend/.env
+
+Environment="PATH=/opt/apex-trading/backend/venv/bin:/usr/local/bin:/usr/bin:/bin"
+
+ExecStart=/opt/apex-trading/backend/venv/bin/python watchdog.py
+
+Restart=always
+RestartSec=15
+StartLimitIntervalSec=180
+StartLimitBurst=4
+
+StandardOutput=append:/var/log/apex/watchdog.log
+StandardError=append:/var/log/apex/watchdog.log
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/opt/apex-trading/backend /var/log/apex
+
+[Install]
+WantedBy=multi-user.target

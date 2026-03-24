@@ -1,0 +1,35 @@
+[Unit]
+Description=APEX Trading System — Backend (FastAPI + Agents)
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=apex
+Group=apex
+WorkingDirectory=/opt/apex-trading/backend
+EnvironmentFile=/opt/apex-trading/backend/.env
+
+# Activate venv by prepending it to PATH
+Environment="PATH=/opt/apex-trading/backend/venv/bin:/usr/local/bin:/usr/bin:/bin"
+
+ExecStart=/opt/apex-trading/backend/venv/bin/python main.py
+
+# Restart policy
+Restart=always
+RestartSec=10
+StartLimitIntervalSec=120
+StartLimitBurst=5
+
+# Logging
+StandardOutput=append:/var/log/apex/backend.log
+StandardError=append:/var/log/apex/backend.log
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/opt/apex-trading/backend /var/log/apex
+
+[Install]
+WantedBy=multi-user.target

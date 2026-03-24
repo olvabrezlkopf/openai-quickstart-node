@@ -282,6 +282,64 @@ async def health():
     return {"status": "ok", "timestamp": datetime.now(timezone.utc).isoformat()}
 
 
+# ─── Tax Endpoints ────────────────────────────────────────────────────────────
+
+@app.get("/api/tax/summary")
+async def tax_summary(year: int = Query(default=0)):
+    """Get tax summary for a given year (defaults to current year)."""
+    import sys, os
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from tax.calculator import compute_tax_summary
+    from dataclasses import asdict
+
+    if year == 0:
+        year = date.today().year
+
+    async with await get_db() as db:
+        rows = await db.execute_fetchall(
+            "SELECT * FROM trades WHERE status IN ('closed', 'liquidated')"
+        )
+    trades = [dict(r) for r in rows]
+    summary = compute_tax_summary(trades, year)
+    return asdict(summary)
+
+
+@app.get("/api/tax/export")
+async def tax_export(year: int = Query(default=0)):
+    """Generate and return tax CSV export for a given year."""
+    from fastapi.responses import FileResponse
+    from tax.calculator import generate_tax_report
+
+    if year == 0:
+        year = date.today().year
+
+    result = await generate_tax_report(year)
+    csv_path = result["csv_path"]
+
+    if not os.path.exists(csv_path):
+        raise HTTPException(status_code=404, detail="No trades found for export")
+
+    return FileResponse(
+        path=csv_path,
+        media_type="text/csv",
+        filename=os.path.basename(csv_path),
+    )
+
+
+@app.get("/api/tax/years")
+async def tax_years():
+    """List all years that have closed trades."""
+    async with await get_db() as db:
+        rows = await db.execute_fetchall(
+            """SELECT DISTINCT strftime('%Y', timestamp_close) as year
+               FROM trades
+               WHERE status IN ('closed', 'liquidated')
+               AND timestamp_close IS NOT NULL
+               ORDER BY year DESC"""
+        )
+    return [r["year"] for r in rows if r["year"]]
+
+
 # ─── Startup ──────────────────────────────────────────────────────────────────
 
 @app.on_event("startup")

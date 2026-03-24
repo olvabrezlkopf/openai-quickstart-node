@@ -21,6 +21,22 @@ INTERVAL_SEC = int(os.getenv("SENTIMENT_INTERVAL_SEC", "300"))  # 5 minutes
 # Subreddits to monitor
 SUBREDDITS = ["CryptoCurrency", "Bitcoin", "ethereum", "CryptoMarkets"]
 
+# FinancialJuice RSS — try URLs in order, first success wins
+FINANCIALJUICE_RSS_URLS = [
+    "https://www.financialjuice.com/feed",
+    "https://www.financialjuice.com/rss",
+]
+# Only these categories are relevant to crypto price action
+FINANCIALJUICE_RELEVANT_CATEGORIES = {"crypto", "macro", "market moving", "risk"}
+# Browser-like UA — the site returns 403 to default HTTP clients
+_BROWSER_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+    ),
+    "Accept": "application/rss+xml, application/xml, text/xml, */*",
+}
+
 # Asset keywords for targeted scoring
 ASSET_KEYWORDS: dict[str, list[str]] = {
     "BTC":  ["bitcoin", "btc", "#bitcoin"],
@@ -153,29 +169,118 @@ async def fetch_cryptopanic_sentiment() -> dict[str, list[float]]:
         return {}
 
 
+async def fetch_financialjuice_sentiment() -> dict[str, list[float]]:
+    """
+    Fetch FinancialJuice RSS headlines and score sentiment per asset.
+
+    FinancialJuice is a professional real-time market-moving news service.
+    Only categories relevant to crypto price action are included:
+    Crypto, Macro, Market Moving, Risk.
+
+    Returns {asset: [scores]} mapping, or {} on failure.
+    """
+    try:
+        import feedparser
+    except ImportError:
+        logger.warning("[Sentiment] feedparser not installed — skipping FinancialJuice")
+        return {}
+
+    import httpx
+
+    for url in FINANCIALJUICE_RSS_URLS:
+        try:
+            async with httpx.AsyncClient(timeout=15, follow_redirects=True) as client:
+                resp = await client.get(url, headers=_BROWSER_HEADERS)
+            if resp.status_code != 200:
+                logger.debug(f"[Sentiment] FinancialJuice {url} → HTTP {resp.status_code}")
+                continue
+
+            feed = feedparser.parse(resp.text)
+            if not feed.entries:
+                logger.debug(f"[Sentiment] FinancialJuice {url} → empty feed")
+                continue
+
+            asset_scores: dict[str, list[float]] = {}
+            skipped = 0
+
+            for entry in feed.entries:
+                # Filter by category — skip Equities/Forex noise
+                categories = [
+                    tag.get("term", "").lower()
+                    for tag in getattr(entry, "tags", [])
+                ]
+                # Also check the category field directly
+                if hasattr(entry, "category"):
+                    categories.append(entry.category.lower())
+
+                if categories and not any(
+                    c in FINANCIALJUICE_RELEVANT_CATEGORIES for c in categories
+                ):
+                    skipped += 1
+                    continue
+
+                title = getattr(entry, "title", "")
+                summary = getattr(entry, "summary", "")
+                text = f"{title} {summary}".strip()
+                if not text:
+                    continue
+
+                score = score_text(text)
+                assets = detect_assets(text)
+                for asset in assets:
+                    asset_scores.setdefault(asset, []).append(score)
+
+            logger.info(
+                f"[Sentiment] FinancialJuice: {len(feed.entries)} entries, "
+                f"{skipped} skipped (off-category), "
+                f"{sum(len(v) for v in asset_scores.values())} scores for "
+                f"{len(asset_scores)} assets"
+            )
+            return asset_scores
+
+        except Exception as e:
+            logger.warning(f"[Sentiment] FinancialJuice fetch error ({url}): {e}")
+
+    logger.warning("[Sentiment] FinancialJuice: all URLs failed — skipping source")
+    return {}
+
+
 def aggregate_scores(
     reddit_scores: dict[str, list[float]],
-    news_scores: dict[str, list[float]],
+    cryptopanic_scores: dict[str, list[float]],
+    fj_scores: dict[str, list[float]],
 ) -> dict[str, float]:
-    """Merge sources and compute weighted average per asset."""
-    all_assets = set(reddit_scores) | set(news_scores)
+    """
+    Merge three sources into a single per-asset score using weighted average.
+
+    Weights (when all sources present):
+      FinancialJuice  40%  — fastest, professional-grade, high signal-to-noise
+      CryptoPanic     30%  — broad crypto news coverage
+      Reddit          30%  — retail sentiment / crowd psychology
+
+    Missing sources are dropped and remaining weights rescaled proportionally.
+    """
+    all_assets = set(reddit_scores) | set(cryptopanic_scores) | set(fj_scores)
     result = {}
+
     for asset in all_assets:
         reddit = reddit_scores.get(asset, [])
-        news = news_scores.get(asset, [])
+        cp     = cryptopanic_scores.get(asset, [])
+        fj     = fj_scores.get(asset, [])
 
-        # Weight: news 60%, reddit 40%
-        reddit_avg = sum(reddit) / len(reddit) if reddit else 0.0
-        news_avg = sum(news) / len(news) if news else 0.0
+        reddit_avg = sum(reddit) / len(reddit) if reddit else None
+        cp_avg     = sum(cp)     / len(cp)     if cp     else None
+        fj_avg     = sum(fj)     / len(fj)     if fj     else None
 
-        if reddit and news:
-            combined = 0.4 * reddit_avg + 0.6 * news_avg
-        elif news:
-            combined = news_avg
-        else:
-            combined = reddit_avg
+        # Build weighted sum from available sources
+        weighted_sum = 0.0
+        total_weight = 0.0
+        if fj_avg     is not None: weighted_sum += 0.40 * fj_avg;     total_weight += 0.40
+        if cp_avg     is not None: weighted_sum += 0.30 * cp_avg;     total_weight += 0.30
+        if reddit_avg is not None: weighted_sum += 0.30 * reddit_avg; total_weight += 0.30
 
-        result[asset] = round(combined, 4)
+        if total_weight > 0:
+            result[asset] = round(weighted_sum / total_weight, 4)
 
     return result
 
@@ -200,18 +305,26 @@ async def run_cycle() -> None:
     """Single sentiment collection cycle."""
     logger.info("[Sentiment] Starting collection cycle")
 
-    reddit_scores, news_scores = await asyncio.gather(
+    reddit_scores, cryptopanic_scores, fj_scores = await asyncio.gather(
         fetch_reddit_sentiment(),
         fetch_cryptopanic_sentiment(),
+        fetch_financialjuice_sentiment(),
     )
 
-    scores = aggregate_scores(reddit_scores, news_scores)
+    scores = aggregate_scores(reddit_scores, cryptopanic_scores, fj_scores)
     await write_scores(scores)
 
     if scores:
         top = sorted(scores.items(), key=lambda x: x[1], reverse=True)[:3]
         logger.info(f"[Sentiment] Top bullish: {top}")
-        await log_agent(AGENT_NAME, "INFO", "Sentiment cycle complete", {"scores": scores})
+        sources_active = sum([
+            bool(reddit_scores), bool(cryptopanic_scores), bool(fj_scores)
+        ])
+        await log_agent(AGENT_NAME, "INFO", "Sentiment cycle complete", {
+            "scores": scores,
+            "sources_active": sources_active,
+            "fj_assets": len(fj_scores),
+        })
 
 
 async def run() -> None:

@@ -29,8 +29,10 @@ POLL_INTERVAL_SEC = 10  # How often to check for pending signals
 
 # LLM debate configuration — models vote BUY / SELL / PASS
 DEBATE_MODELS = [
-    {"provider": "anthropic", "model": "claude-haiku-4-5-20251001"},
-    {"provider": "openai",    "model": "gpt-4o-mini"},
+    {"provider": "anthropic",  "model": "claude-haiku-4-5-20251001"},
+    {"provider": "openai",     "model": "gpt-4o-mini"},
+    {"provider": "openrouter", "model": "mistralai/mistral-7b-instruct"},
+    {"provider": "google",     "model": "gemini-2.0-flash"},
 ]
 
 TEAM_LEADER_MODEL = os.getenv("TEAM_LEADER_MODEL", "claude-haiku-4-5-20251001")
@@ -106,7 +108,7 @@ class TeamLeader:
             return "PASS|API error"
 
     async def _call_openai(self, prompt: str, model: str) -> str:
-        """Call OpenAI-compatible API."""
+        """Call OpenAI API."""
         api_key = os.getenv("OPENAI_API_KEY", "")
         if not api_key:
             return "PASS|No OpenAI API key configured"
@@ -127,12 +129,65 @@ class TeamLeader:
             logger.error(f"[TL] OpenAI call failed: {e}")
             return "PASS|API error"
 
+    async def _call_openrouter(self, prompt: str, model: str) -> str:
+        """Call OpenRouter API (OpenAI-compatible, supports Mistral/Llama/etc)."""
+        api_key = os.getenv("OPENROUTER_API_KEY", "")
+        if not api_key:
+            return "PASS|No OpenRouter API key configured"
+        try:
+            async with httpx.AsyncClient(timeout=30) as client:
+                resp = await client.post(
+                    "https://openrouter.ai/api/v1/chat/completions",
+                    headers={
+                        "Authorization": f"Bearer {api_key}",
+                        "HTTP-Referer": "https://apex-trading.local",
+                        "X-Title": "APEX Trading System",
+                    },
+                    json={
+                        "model": model,
+                        "messages": [{"role": "user", "content": prompt}],
+                        "max_tokens": MAX_TOKENS,
+                    },
+                )
+                resp.raise_for_status()
+                return resp.json()["choices"][0]["message"]["content"].strip()
+        except Exception as e:
+            logger.error(f"[TL] OpenRouter call failed: {e}")
+            return "PASS|API error"
+
+    async def _call_gemini(self, prompt: str, model: str) -> str:
+        """Call Google Gemini API."""
+        api_key = os.getenv("GOOGLE_API_KEY", "")
+        if not api_key:
+            return "PASS|No Google API key configured"
+        try:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+            async with httpx.AsyncClient(timeout=30) as client:
+                resp = await client.post(
+                    url,
+                    params={"key": api_key},
+                    json={
+                        "contents": [{"parts": [{"text": prompt}]}],
+                        "generationConfig": {"maxOutputTokens": MAX_TOKENS},
+                    },
+                )
+                resp.raise_for_status()
+                data = resp.json()
+                return data["candidates"][0]["content"]["parts"][0]["text"].strip()
+        except Exception as e:
+            logger.error(f"[TL] Gemini call failed: {e}")
+            return "PASS|API error"
+
     async def _call_model(self, provider: str, model: str, prompt: str) -> str:
         """Route to the correct API provider."""
         if provider == "anthropic":
             return await self._call_anthropic(prompt)
-        elif provider in ("openai", "openrouter"):
+        elif provider == "openai":
             return await self._call_openai(prompt, model)
+        elif provider == "openrouter":
+            return await self._call_openrouter(prompt, model)
+        elif provider == "google":
+            return await self._call_gemini(prompt, model)
         return "PASS|Unknown provider"
 
     def _parse_verdict(self, response: str) -> tuple[str, str]:
@@ -369,6 +424,9 @@ class TeamLeader:
                         signal = dict(row)
                         if signal.get("technical_data"):
                             signal["indicators"] = json.loads(signal["technical_data"])
+                            # price is stored inside technical_data, not as its own column
+                            if not signal.get("price"):
+                                signal["price"] = signal["indicators"].get("price", 0.0)
                         await self.process_signal(signal)
             except Exception as e:
                 logger.error(f"[TL] Poll error: {e}")

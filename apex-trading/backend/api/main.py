@@ -287,8 +287,6 @@ async def health():
 @app.get("/api/tax/summary")
 async def tax_summary(year: int = Query(default=0)):
     """Get tax summary for a given year (defaults to current year)."""
-    import sys, os
-    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     from tax.calculator import compute_tax_summary
     from dataclasses import asdict
 

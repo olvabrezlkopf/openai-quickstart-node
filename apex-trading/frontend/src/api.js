@@ -24,4 +24,7 @@ export const api = {
   optimizer:   (limit = 10) => get(`/optimizer?limit=${limit}`),
   pause:       () => post('/pause'),
   resume:      () => post('/resume'),
+  taxSummary:  (year) => get(`/tax/summary${year ? `?year=${year}` : ''}`),
+  taxYears:    () => get('/tax/years'),
+  taxExportUrl:(year) => `/api/tax/export?year=${year}`,
 }

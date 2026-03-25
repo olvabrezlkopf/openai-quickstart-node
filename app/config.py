@@ -27,7 +27,7 @@ class Settings(BaseSettings):
 
     # Admin credentials
     admin_username: str = "admin"
-    admin_password_hash: str = ""
+    admin_password: str = "admin"
 
     # Logging
     log_level: str = "INFO"

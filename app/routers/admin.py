@@ -50,15 +50,8 @@ async def login(request: LoginRequest, response: Response):
     if request.username != settings.admin_username:
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    # Verify password against hash
-    try:
-        from passlib.hash import bcrypt
-        if not settings.admin_password_hash or not bcrypt.verify(request.password, settings.admin_password_hash):
-            raise HTTPException(status_code=401, detail="Invalid credentials")
-    except Exception:
-        # If no hash configured, check against plaintext fallback for dev
-        if request.password != "admin":
-            raise HTTPException(status_code=401, detail="Invalid credentials")
+    if request.password != settings.admin_password:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
 
     token = create_admin_token(request.username)
     response.set_cookie(

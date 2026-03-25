@@ -25,6 +25,11 @@ Internal Tools  →  MYLLM Proxy  →  Anthropic / OpenAI / Ollama
 | `ra-local` | llama3.2:8b | Ollama |
 | `ra-local-fast` | llama3.2:3b | Ollama |
 
+## Prerequisites
+
+- **Docker Desktop** must be installed and running (Windows/macOS: start the Docker Desktop app first)
+- Docker Compose v2+ (included with Docker Desktop)
+
 ## Quick Start
 
 ```bash
@@ -151,7 +156,7 @@ Access the admin dashboard at `http://localhost/` (port 80).
 | `OPENAI_API_KEY` | OpenAI API key | (optional) |
 | `OLLAMA_BASE_URL` | Ollama server URL | `http://host.docker.internal:11434` |
 | `ADMIN_USERNAME` | Dashboard login username | `admin` |
-| `ADMIN_PASSWORD_HASH` | Bcrypt hash of admin password | (optional, defaults to "admin") |
+| `ADMIN_PASSWORD` | Admin dashboard password | `admin` |
 
 ## Backup
 

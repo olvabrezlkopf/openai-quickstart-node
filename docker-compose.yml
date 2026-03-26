@@ -36,7 +36,7 @@ services:
       DATABASE_URL: postgresql+asyncpg://proxy:proxy@postgres:5432/llmproxy
       REDIS_URL: redis://redis:6379/0
     ports:
-      - "8080:8000"
+      - "8888:8000"
     depends_on:
       postgres:
         condition: service_healthy

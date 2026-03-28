@@ -1,0 +1,141 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-xl);
+}
+
+.title {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+}
+
+.addBtn {
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+}
+
+.addBtn:hover {
+  background: var(--color-primary-dark);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: var(--space-md);
+}
+
+.card {
+  display: block;
+  background: var(--color-bg);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+
+.card:hover {
+  border-color: var(--color-primary-light);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.08);
+}
+
+.cardCategory {
+  font-size: 0.7rem;
+  background: var(--color-gray-100);
+  color: var(--color-gray-600);
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+
+.cardName {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  margin-top: var(--space-sm);
+}
+
+.cardGoal {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  margin-top: var(--space-xs);
+  line-height: 1.4;
+}
+
+.cardMeta {
+  display: block;
+  margin-top: var(--space-md);
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-400);
+}
+
+.empty {
+  text-align: center;
+  padding: var(--space-2xl);
+}
+
+.emptyText {
+  font-size: var(--font-size-lg);
+  color: var(--color-gray-600);
+  margin-bottom: var(--space-sm);
+}
+
+.emptyHint {
+  color: var(--color-gray-400);
+  font-size: var(--font-size-sm);
+}
+
+/* Form styles */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.formLabel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-gray-600);
+}
+
+.formInput,
+.formTextarea,
+.formSelect {
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-base);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.formInput:focus,
+.formTextarea:focus,
+.formSelect:focus {
+  border-color: var(--color-primary);
+}
+
+.formTextarea {
+  resize: vertical;
+}
+
+.submitBtn {
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: var(--font-size-base);
+  margin-top: var(--space-sm);
+}
+
+.submitBtn:hover {
+  background: var(--color-primary-dark);
+}

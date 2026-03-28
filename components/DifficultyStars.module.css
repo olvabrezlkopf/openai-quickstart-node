@@ -1,0 +1,36 @@
+.wrapper {
+  margin-bottom: var(--space-md);
+}
+
+.label {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-gray-600);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-sm);
+}
+
+.stars {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.star {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--color-gray-300);
+  padding: 2px;
+  line-height: 1;
+  transition: color 0.1s, transform 0.1s;
+}
+
+.star:hover {
+  transform: scale(1.15);
+}
+
+.filled {
+  color: var(--color-warning);
+}

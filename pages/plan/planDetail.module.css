@@ -1,0 +1,200 @@
+.backLink {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  padding: 0;
+  margin-bottom: var(--space-lg);
+  display: inline-block;
+}
+
+.backLink:hover {
+  text-decoration: underline;
+}
+
+.planHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-xl);
+}
+
+.category {
+  font-size: 0.7rem;
+  background: var(--color-gray-100);
+  color: var(--color-gray-600);
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+
+.planName {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  margin-top: var(--space-sm);
+}
+
+.planGoal {
+  color: var(--color-text-secondary);
+  margin-top: var(--space-xs);
+}
+
+.deleteBtn {
+  padding: var(--space-xs) var(--space-md);
+  background: none;
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-sm);
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+}
+
+.deleteBtn:hover {
+  background: var(--color-danger);
+  color: white;
+}
+
+.itemsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-md);
+}
+
+.itemsTitle {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+}
+
+.addBtn {
+  padding: var(--space-xs) var(--space-md);
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.addBtn:hover {
+  background: var(--color-primary-dark);
+}
+
+.emptyText {
+  text-align: center;
+  color: var(--color-gray-400);
+  padding: var(--space-xl);
+}
+
+.ladder {
+  position: relative;
+}
+
+.ladderStep {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  position: relative;
+}
+
+.stepNumber {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-gray-100);
+  color: var(--color-gray-500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  flex-shrink: 0;
+  margin-top: var(--space-md);
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.notFound {
+  text-align: center;
+  padding: var(--space-2xl);
+  color: var(--color-gray-500);
+}
+
+.backBtn {
+  margin-top: var(--space-md);
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+}
+
+/* Form styles */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.formLabel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-gray-600);
+}
+
+.formInput,
+.formTextarea,
+.formSelect {
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-base);
+  outline: none;
+}
+
+.formInput:focus,
+.formTextarea:focus,
+.formSelect:focus {
+  border-color: var(--color-primary);
+}
+
+.formTextarea {
+  resize: vertical;
+}
+
+.formActions {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+}
+
+.submitBtn {
+  flex: 1;
+  padding: var(--space-sm);
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+}
+
+.submitBtn:hover {
+  background: var(--color-primary-dark);
+}
+
+.deleteBtnSmall {
+  padding: var(--space-sm) var(--space-md);
+  background: none;
+  border: 1px solid var(--color-danger);
+  color: var(--color-danger);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+}
+
+.deleteBtnSmall:hover {
+  background: var(--color-danger);
+  color: white;
+}

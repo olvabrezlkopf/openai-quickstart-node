@@ -1,58 +1,114 @@
-import Head from "next/head";
-import { useState } from "react";
-import styles from "./index.module.css";
+import Head from 'next/head';
+import Link from 'next/link';
+import { useMemo } from 'react';
+import styles from './index.module.css';
+import { useData } from '../context/DataContext';
+import { calcStreak, calcCompletionRate, calcAvgSudsDrop } from '../lib/stats';
+import MetricCard from '../components/MetricCard';
 
-export default function Home() {
-  const [animalInput, setAnimalInput] = useState("");
-  const [result, setResult] = useState();
+export default function Dashboard() {
+  const { state, isHydrated } = useData();
 
-  async function onSubmit(event) {
-    event.preventDefault();
-    try {
-      const response = await fetch("/api/generate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ animal: animalInput }),
-      });
+  const streak = useMemo(() => calcStreak(state.scheduled), [state.scheduled]);
+  const completionRate = useMemo(() => calcCompletionRate(state.scheduled), [state.scheduled]);
+  const avgDrop = useMemo(() => calcAvgSudsDrop(state.logs), [state.logs]);
 
-      const data = await response.json();
-      if (response.status !== 200) {
-        throw data.error || new Error(`Request failed with status ${response.status}`);
-      }
+  const nextExposure = useMemo(() => {
+    const today = new Date().toISOString().slice(0, 10);
+    return Object.values(state.scheduled)
+      .filter((s) => s.status === 'planned' && s.date >= today)
+      .sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time))[0] || null;
+  }, [state.scheduled]);
 
-      setResult(data.result);
-      setAnimalInput("");
-    } catch(error) {
-      // Consider implementing your own error handling logic here
-      console.error(error);
-      alert(error.message);
-    }
-  }
+  const recentActivity = useMemo(() => {
+    const completed = Object.values(state.scheduled)
+      .filter((s) => s.status === 'completed')
+      .sort((a, b) => b.date.localeCompare(a.date))
+      .slice(0, 5);
+    return completed;
+  }, [state.scheduled]);
+
+  if (!isHydrated) return <div className={styles.skeleton} />;
+
+  const hasData = Object.keys(state.scheduled).length > 0;
 
   return (
     <div>
       <Head>
-        <title>OpenAI Quickstart</title>
-        <link rel="icon" href="/dog.png" />
+        <title>Mutig — Dein Expositions-Coach</title>
       </Head>
+      <h1 className={styles.title}>Dashboard</h1>
+      <p className={styles.subtitle}>Dein persönlicher Angst-Coach</p>
 
-      <main className={styles.main}>
-        <img src="/dog.png" className={styles.icon} />
-        <h3>Name my pet</h3>
-        <form onSubmit={onSubmit}>
-          <input
-            type="text"
-            name="animal"
-            placeholder="Enter an animal"
-            value={animalInput}
-            onChange={(e) => setAnimalInput(e.target.value)}
-          />
-          <input type="submit" value="Generate names" />
-        </form>
-        <div className={styles.result}>{result}</div>
-      </main>
+      {!hasData ? (
+        <div className={styles.emptyState}>
+          <p className={styles.emptyTitle}>Willkommen bei Mutig</p>
+          <p>Erstelle deinen ersten Expositionsplan und beginne deine Reise.</p>
+          <Link href="/plan" className={styles.ctaButton}>Ersten Plan erstellen</Link>
+        </div>
+      ) : (
+        <>
+          <div className={styles.metrics}>
+            <MetricCard
+              label="Streak"
+              value={streak}
+              unit={streak === 1 ? 'Tag' : 'Tage'}
+              color="var(--color-primary)"
+            />
+            <MetricCard
+              label="Completion Rate"
+              value={completionRate}
+              unit="%"
+              color="var(--color-success)"
+            />
+            <MetricCard
+              label="Ø SUDS-Drop"
+              value={avgDrop}
+              unit="Punkte"
+              color="var(--color-warning)"
+            />
+          </div>
+
+          {nextExposure && (
+            <div className={styles.nextUp}>
+              <span className={styles.nextUpTitle}>Nächste Exposition</span>
+              <p className={styles.nextUpItem}>
+                {state.items[nextExposure.itemId]?.title || 'Unbekannt'}
+              </p>
+              <p className={styles.nextUpDate}>
+                {new Date(nextExposure.date + 'T00:00').toLocaleDateString('de-DE', {
+                  weekday: 'long', day: 'numeric', month: 'long'
+                })} um {nextExposure.time}
+              </p>
+              <Link href={`/log/${nextExposure.id}`} className={styles.ctaButton} style={{ marginTop: '12px' }}>
+                Jetzt starten
+              </Link>
+            </div>
+          )}
+
+          {recentActivity.length > 0 && (
+            <div>
+              <h2 style={{ fontSize: 'var(--font-size-lg)', fontWeight: 600, marginBottom: 'var(--space-md)' }}>
+                Letzte Aktivitäten
+              </h2>
+              <ul className={styles.recentList}>
+                {recentActivity.map((sched) => (
+                  <li key={sched.id} className={styles.recentItem}>
+                    <span className={styles.recentTitle}>
+                      {state.items[sched.itemId]?.title || 'Unbekannt'}
+                    </span>
+                    <span className={styles.recentMeta}>
+                      {new Date(sched.date + 'T00:00').toLocaleDateString('de-DE', {
+                        day: 'numeric', month: 'short'
+                      })}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }

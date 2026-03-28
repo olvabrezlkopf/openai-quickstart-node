@@ -1,0 +1,38 @@
+.wrapper {
+  margin-bottom: var(--space-md);
+}
+
+.label {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-gray-600);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-sm);
+}
+
+.moods {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.mood {
+  font-size: 1.75rem;
+  background: var(--color-gray-50);
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  padding: var(--space-sm);
+  line-height: 1;
+  transition: transform 0.1s, border-color 0.1s;
+}
+
+.mood:hover {
+  transform: scale(1.15);
+}
+
+.selected {
+  border-color: var(--color-primary);
+  background: white;
+  transform: scale(1.1);
+}

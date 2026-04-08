@@ -7,104 +7,159 @@
 .subtitle {
   color: var(--color-text-secondary);
   margin-bottom: var(--space-xl);
-}
-
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-lg);
-  margin-bottom: var(--space-2xl);
-}
-
-.formLabel {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  color: var(--color-gray-600);
-}
-
-.formTextarea {
-  padding: var(--space-sm) var(--space-md);
-  border: 1px solid var(--color-gray-200);
-  border-radius: var(--radius-sm);
   font-size: var(--font-size-base);
-  outline: none;
-  resize: vertical;
 }
 
-.formTextarea:focus {
-  border-color: var(--color-primary);
+/* Empty state */
+.empty {
+  text-align: center;
+  padding: var(--space-2xl);
+  border: 2px dashed var(--color-gray-200);
+  border-radius: var(--radius-md);
 }
 
-.submitBtn {
-  padding: var(--space-md);
+.emptyTitle {
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  color: var(--color-gray-700);
+  margin-bottom: var(--space-sm);
+}
+
+.emptyHint {
+  color: var(--color-gray-500);
+  font-size: var(--font-size-sm);
+  max-width: 400px;
+  margin: 0 auto var(--space-lg);
+  line-height: 1.5;
+}
+
+.ctaBtn {
+  display: inline-block;
+  padding: var(--space-sm) var(--space-lg);
   background: var(--color-primary);
   color: white;
-  border: none;
   border-radius: var(--radius-md);
   font-weight: 600;
-  font-size: var(--font-size-base);
 }
 
-.submitBtn:hover {
+.ctaBtn:hover {
   background: var(--color-primary-dark);
 }
 
-/* History */
-.history {
-  border-top: 1px solid var(--color-gray-200);
-  padding-top: var(--space-xl);
-}
-
-.historyTitle {
-  font-size: var(--font-size-lg);
-  font-weight: 600;
-  margin-bottom: var(--space-md);
+/* Entry list */
+.entryList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
 }
 
 .entry {
-  padding: var(--space-md);
-  border: 1px solid var(--color-gray-100);
+  padding: var(--space-lg);
+  background: var(--color-bg);
+  border: 1px solid var(--color-gray-200);
   border-radius: var(--radius-md);
-  margin-bottom: var(--space-sm);
 }
 
 .entryHeader {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: var(--space-md);
   margin-bottom: var(--space-sm);
-}
-
-.entryMood {
-  font-size: 1.25rem;
+  flex-wrap: wrap;
 }
 
 .entryDate {
   font-size: var(--font-size-sm);
   color: var(--color-gray-400);
+  font-weight: 500;
 }
 
-.entryText {
-  font-size: var(--font-size-sm);
-  color: var(--color-gray-700);
-  line-height: 1.5;
-  margin-bottom: var(--space-xs);
+.entryLink {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--color-primary);
+  padding: 3px 10px;
+  background: rgba(79, 70, 229, 0.08);
+  border-radius: 99px;
+  text-decoration: none;
 }
 
-.moreBtn {
-  width: 100%;
-  padding: var(--space-sm);
-  background: none;
-  border: 1px solid var(--color-gray-200);
-  border-radius: var(--radius-sm);
-  color: var(--color-gray-500);
-  font-size: var(--font-size-sm);
-  margin-top: var(--space-sm);
+.entryLink:hover {
+  background: rgba(79, 70, 229, 0.15);
 }
 
-.moreBtn:hover {
+.entryMood {
+  font-size: 1.5rem;
+  margin-left: auto;
+}
+
+.sudsRow {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+  padding: var(--space-xs) var(--space-sm);
   background: var(--color-gray-50);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+}
+
+.sudsLabel {
+  font-weight: 600;
+  color: var(--color-gray-500);
+}
+
+.sudsBefore {
+  color: var(--color-danger);
+  font-weight: 700;
+}
+
+.sudsArrow {
+  color: var(--color-gray-400);
+}
+
+.sudsAfter {
+  color: var(--color-success);
+  font-weight: 700;
+}
+
+.sudsDrop {
+  color: var(--color-success);
+  font-weight: 600;
+  margin-left: var(--space-xs);
+}
+
+.duration {
+  color: var(--color-gray-500);
+  margin-left: var(--space-sm);
+}
+
+.entryFields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.field {
+  padding: var(--space-sm) 0;
+  border-bottom: 1px solid var(--color-gray-100);
+}
+
+.field:last-child {
+  border-bottom: none;
+}
+
+.fieldLabel {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-gray-400);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.fieldValue {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-800);
+  line-height: 1.5;
 }

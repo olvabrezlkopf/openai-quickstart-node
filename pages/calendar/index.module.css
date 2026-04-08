@@ -1,3 +1,137 @@
+/* Layouts */
+.layoutSingle {
+  max-width: 800px;
+}
+
+.layoutTwoCol {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-lg);
+}
+
+@media (min-width: 900px) {
+  .layoutTwoCol {
+    grid-template-columns: 280px 1fr;
+    align-items: start;
+  }
+}
+
+/* Sidebar / Event list */
+.sidebar {
+  background: var(--color-surface);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  position: sticky;
+  top: var(--space-md);
+}
+
+.sidebarTitle {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-gray-500);
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--color-gray-200);
+}
+
+.eventList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.eventItem {
+  display: flex;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  background: var(--color-bg);
+  border: 1px solid var(--color-gray-100);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.1s;
+}
+
+.eventItem:hover {
+  border-color: var(--color-primary-light);
+  transform: translateX(2px);
+}
+
+.eventPast {
+  opacity: 0.6;
+}
+
+.eventToday {
+  border-left: 3px solid var(--color-primary);
+}
+
+.eventDate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  padding: var(--space-xs) 0;
+  background: var(--color-gray-50);
+  border-radius: var(--radius-sm);
+}
+
+.eventDay {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-gray-900);
+  line-height: 1;
+}
+
+.eventMonth {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  color: var(--color-gray-500);
+  margin-top: 2px;
+}
+
+.eventBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.eventTitle {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-gray-800);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.eventMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-top: 2px;
+  font-size: 0.7rem;
+  color: var(--color-gray-500);
+}
+
+.eventStatus {
+  color: white;
+  padding: 1px 6px;
+  border-radius: 99px;
+  font-size: 0.65rem;
+  white-space: nowrap;
+}
+
+/* Main calendar area */
+.main {
+  min-width: 0;
+}
+
 .monthNav {
   display: flex;
   align-items: center;
@@ -28,9 +162,9 @@
   background: var(--color-gray-50);
 }
 
-/* Day panel */
+/* Day panel (below calendar, only when day selected) */
 .dayPanel {
-  margin-top: var(--space-xl);
+  margin-top: var(--space-lg);
   padding: var(--space-lg);
   background: var(--color-surface);
   border: 1px solid var(--color-gray-200);
@@ -43,15 +177,8 @@
   margin-bottom: var(--space-md);
 }
 
-.noExposures {
-  color: var(--color-gray-400);
-  font-size: var(--font-size-sm);
-  margin-bottom: var(--space-md);
-}
-
 .exposureList {
   list-style: none;
-  margin-bottom: var(--space-md);
 }
 
 .exposureItem {
@@ -60,6 +187,10 @@
   gap: var(--space-sm);
   padding: var(--space-sm) 0;
   border-bottom: 1px solid var(--color-gray-100);
+}
+
+.exposureItem:last-child {
+  border-bottom: none;
 }
 
 .exposureInfo {
@@ -76,24 +207,12 @@
   color: var(--color-gray-400);
 }
 
-.statusBadge {
-  font-size: 0.7rem;
-  color: white;
-  padding: 2px 8px;
-  border-radius: 99px;
-  white-space: nowrap;
-}
-
-.logBtn,
-.viewBtn {
-  padding: var(--space-xs) var(--space-sm);
+.logBtn {
+  padding: var(--space-xs) var(--space-md);
   border: none;
   border-radius: var(--radius-sm);
   font-size: var(--font-size-sm);
   font-weight: 500;
-}
-
-.logBtn {
   background: var(--color-primary);
   color: white;
 }
@@ -102,16 +221,8 @@
   background: var(--color-primary-dark);
 }
 
-.viewBtn {
-  background: var(--color-gray-100);
-  color: var(--color-gray-600);
-}
-
-.viewBtn:hover {
-  background: var(--color-gray-200);
-}
-
 .scheduleBtn {
+  margin-top: var(--space-md);
   padding: var(--space-sm) var(--space-md);
   background: var(--color-primary);
   color: white;

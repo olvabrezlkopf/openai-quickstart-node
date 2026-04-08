@@ -1,0 +1,133 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.empty {
+  text-align: center;
+  color: var(--color-gray-400);
+  padding: var(--space-xl);
+}
+
+.phase {
+  background: var(--color-bg);
+}
+
+.phaseName {
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: var(--color-gray-800);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-gray-50);
+  border-left: 3px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-sm);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.table thead {
+  background: var(--color-gray-50);
+}
+
+.table th {
+  text-align: left;
+  padding: var(--space-sm);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-gray-500);
+  font-weight: 600;
+  border-bottom: 1px solid var(--color-gray-200);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: var(--space-sm);
+  border-bottom: 1px solid var(--color-gray-100);
+  vertical-align: top;
+}
+
+.row {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.row:hover {
+  background: var(--color-gray-50);
+}
+
+.small {
+  white-space: nowrap;
+  color: var(--color-gray-600);
+}
+
+.titleCell {
+  font-weight: 600;
+  color: var(--color-gray-900);
+  min-width: 180px;
+}
+
+.focusCell {
+  font-size: 0.75rem;
+  color: var(--color-gray-500);
+  font-style: italic;
+  margin-top: 2px;
+}
+
+.sudsPill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 99px;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.doneBadge {
+  color: var(--color-success);
+  font-weight: 600;
+}
+
+.notDone {
+  color: var(--color-gray-300);
+}
+
+.positive {
+  color: var(--color-success);
+  font-weight: 600;
+}
+
+.neutral {
+  color: var(--color-gray-500);
+}
+
+.journalCell {
+  max-width: 220px;
+}
+
+.journalSnippet {
+  font-size: 0.75rem;
+  color: var(--color-gray-600);
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-style: italic;
+}

@@ -16,7 +16,8 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: var(--space-xl);
+  margin-bottom: var(--space-lg);
+  gap: var(--space-md);
 }
 
 .category {
@@ -45,6 +46,7 @@
   border-radius: var(--radius-sm);
   color: var(--color-danger);
   font-size: var(--font-size-sm);
+  white-space: nowrap;
 }
 
 .deleteBtn:hover {
@@ -52,16 +54,55 @@
   color: white;
 }
 
+/* View toggle */
+.viewToggle {
+  display: flex;
+  gap: 0;
+  background: var(--color-gray-100);
+  border-radius: var(--radius-md);
+  padding: 3px;
+  margin-bottom: var(--space-lg);
+  width: fit-content;
+}
+
+.toggleBtn {
+  padding: var(--space-xs) var(--space-md);
+  border: none;
+  background: none;
+  color: var(--color-gray-500);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s, color 0.15s;
+}
+
+.toggleBtn:hover {
+  color: var(--color-gray-700);
+}
+
+.toggleActive {
+  background: white;
+  color: var(--color-gray-900);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
 .itemsHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: var(--space-md);
+  flex-wrap: wrap;
+  gap: var(--space-sm);
 }
 
 .itemsTitle {
   font-size: var(--font-size-lg);
   font-weight: 600;
+}
+
+.headerActions {
+  display: flex;
+  gap: var(--space-sm);
 }
 
 .addBtn {
@@ -78,40 +119,197 @@
   background: var(--color-primary-dark);
 }
 
+.secondaryBtn {
+  padding: var(--space-xs) var(--space-md);
+  background: var(--color-bg);
+  color: var(--color-gray-700);
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.secondaryBtn:hover {
+  background: var(--color-gray-50);
+}
+
 .emptyText {
   text-align: center;
   color: var(--color-gray-400);
   padding: var(--space-xl);
 }
 
-.ladder {
-  position: relative;
+/* Phase sections */
+.phaseSection {
+  margin-bottom: var(--space-xl);
 }
 
-.ladderStep {
+.phaseHeader {
   display: flex;
-  align-items: flex-start;
-  gap: var(--space-md);
-  position: relative;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-gray-50);
+  border-left: 3px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-sm);
 }
 
-.stepNumber {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--color-gray-100);
+.phaseName {
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: var(--color-gray-800);
+}
+
+.phaseActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.phaseCount {
+  font-size: var(--font-size-sm);
   color: var(--color-gray-500);
+  margin-right: var(--space-sm);
+}
+
+.phaseActionBtn {
+  background: none;
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-sm);
+  width: 24px;
+  height: 24px;
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-500);
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  flex-shrink: 0;
-  margin-top: var(--space-md);
 }
 
-.stepContent {
+.phaseActionBtn:hover {
+  background: white;
+  color: var(--color-gray-900);
+}
+
+.phaseList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.phaseEmpty {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-400);
+  padding: var(--space-sm) var(--space-md);
+  font-style: italic;
+}
+
+/* Item rows (dense, not card-like) */
+.itemRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-bg);
+  border: 1px solid var(--color-gray-100);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.15s;
+}
+
+.itemRow:hover {
+  border-color: var(--color-primary-light);
+}
+
+.itemMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  min-width: 50px;
+}
+
+.weekUnit {
+  font-size: 0.65rem;
+  color: var(--color-gray-400);
+  font-weight: 600;
+}
+
+.sudsPill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 26px;
+  padding: 0 6px;
+  border-radius: 99px;
+  color: white;
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+
+.itemContent {
   flex: 1;
+  min-width: 0;
+}
+
+.itemTitle {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--color-gray-900);
+  margin-bottom: 2px;
+}
+
+.itemInlineInfo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-500);
+}
+
+.itemFocus {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-600);
+  margin-top: var(--space-xs);
+  font-style: italic;
+}
+
+.itemFocus strong {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--color-gray-500);
+}
+
+.itemActions {
+  display: flex;
+  gap: var(--space-xs);
+  flex-shrink: 0;
+}
+
+.btnSmall {
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--color-bg);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-600);
+  min-width: 32px;
+}
+
+.btnSmall:hover {
+  background: var(--color-gray-50);
+}
+
+.btnPrimary {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.btnPrimary:hover {
+  background: var(--color-primary-dark);
 }
 
 .notFound {
@@ -129,20 +327,31 @@
   border-radius: var(--radius-md);
 }
 
-/* Form styles */
+/* Form */
 .form {
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
 }
 
-.formLabel {
+.formLabel,
+.formLabelSmall {
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
   font-size: var(--font-size-sm);
   font-weight: 600;
   color: var(--color-gray-600);
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-sm);
+}
+
+.formRow .formLabelSmall {
+  min-width: 0;
 }
 
 .formInput,
@@ -163,6 +372,16 @@
 
 .formTextarea {
   resize: vertical;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-700);
+  font-weight: 500;
+  cursor: pointer;
 }
 
 .formActions {

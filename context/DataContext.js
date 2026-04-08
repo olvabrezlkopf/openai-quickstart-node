@@ -18,6 +18,15 @@ function reducer(state, action) {
       return { ...state, plans };
     }
 
+    case A.ADD_PHASE:
+      return { ...state, phases: { ...state.phases, [action.payload.id]: action.payload } };
+    case A.UPDATE_PHASE:
+      return { ...state, phases: { ...state.phases, [action.payload.id]: { ...state.phases[action.payload.id], ...action.payload } } };
+    case A.DELETE_PHASE: {
+      const { [action.payload]: _, ...phases } = state.phases;
+      return { ...state, phases };
+    }
+
     case A.ADD_ITEM:
       return { ...state, items: { ...state.items, [action.payload.id]: action.payload } };
     case A.UPDATE_ITEM:
@@ -43,6 +52,19 @@ function reducer(state, action) {
 
     case A.ADD_JOURNAL:
       return { ...state, journals: { ...state.journals, [action.payload.id]: action.payload } };
+    case A.UPDATE_JOURNAL:
+      return { ...state, journals: { ...state.journals, [action.payload.id]: { ...state.journals[action.payload.id], ...action.payload } } };
+
+    case A.IMPORT_PLAN: {
+      // Bulk-import AI-generated plan with phases and items in one go
+      const { plan, phases, items } = action.payload;
+      return {
+        ...state,
+        plans: { ...state.plans, [plan.id]: plan },
+        phases: { ...state.phases, ...phases },
+        items: { ...state.items, ...items },
+      };
+    }
 
     default:
       return state;

@@ -2,7 +2,7 @@ import Head from 'next/head';
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { useData } from '../../context/DataContext';
-import { SCHEDULE_EXPOSURE, UPDATE_SCHEDULE } from '../../context/actions';
+import { SCHEDULE_EXPOSURE } from '../../context/actions';
 import { generateId } from '../../lib/ids';
 import { formatMonthDE, toDateString, formatDateDE } from '../../lib/dates';
 import { STATUS_LABELS } from '../../lib/constants';
@@ -22,9 +22,26 @@ export default function CalendarPage() {
   const [schedTime, setSchedTime] = useState('10:00');
   const [schedNotes, setSchedNotes] = useState('');
 
+  const allScheduled = useMemo(() => {
+    if (!isHydrated) return [];
+    const todayStr = toDateString(new Date());
+    return Object.values(state.scheduled).sort((a, b) => {
+      // Upcoming first (date >= today), then past
+      const aIsUpcoming = a.date >= todayStr;
+      const bIsUpcoming = b.date >= todayStr;
+      if (aIsUpcoming && !bIsUpcoming) return -1;
+      if (!aIsUpcoming && bIsUpcoming) return 1;
+      if (aIsUpcoming) {
+        return a.date.localeCompare(b.date) || (a.time || '').localeCompare(b.time || '');
+      }
+      return b.date.localeCompare(a.date);
+    });
+  }, [state.scheduled, isHydrated]);
+
   if (!isHydrated) return null;
 
   const preselectedItemId = router.query.itemId || '';
+  const hasEvents = allScheduled.length > 0;
 
   function prevMonth() {
     if (month === 0) { setMonth(11); setYear(year - 1); }
@@ -37,7 +54,7 @@ export default function CalendarPage() {
   }
 
   const dayExposures = selectedDate
-    ? Object.values(state.scheduled).filter((s) => s.date === toDateString(selectedDate))
+    ? allScheduled.filter((s) => s.date === toDateString(selectedDate))
     : [];
 
   function getItemTitle(itemId) {
@@ -46,6 +63,10 @@ export default function CalendarPage() {
   }
 
   function openScheduleModal() {
+    if (!selectedDate) {
+      // Default to today if nothing selected
+      setSelectedDate(new Date());
+    }
     setSelectedItemId(preselectedItemId || Object.keys(state.items)[0] || '');
     setSchedTime('10:00');
     setSchedNotes('');
@@ -70,31 +91,75 @@ export default function CalendarPage() {
   }
 
   const allItems = Object.values(state.items);
+  const todayStr = toDateString(new Date());
 
   return (
-    <div>
+    <div className={hasEvents ? styles.layoutTwoCol : styles.layoutSingle}>
       <Head><title>Kalender — Mutig</title></Head>
 
-      <div className={styles.monthNav}>
-        <button className={styles.navBtn} onClick={prevMonth}>‹</button>
-        <h1 className={styles.monthTitle}>{formatMonthDE(year, month)}</h1>
-        <button className={styles.navBtn} onClick={nextMonth}>›</button>
-      </div>
+      {hasEvents && (
+        <aside className={styles.sidebar}>
+          <h2 className={styles.sidebarTitle}>Termine</h2>
+          <ul className={styles.eventList}>
+            {allScheduled.map((sched) => {
+              const item = state.items[sched.itemId];
+              const isToday = sched.date === todayStr;
+              const isPast = sched.date < todayStr;
+              return (
+                <li
+                  key={sched.id}
+                  className={`${styles.eventItem} ${isPast ? styles.eventPast : ''} ${isToday ? styles.eventToday : ''}`}
+                  onClick={() => router.push(`/log/${sched.id}`)}
+                >
+                  <div className={styles.eventDate}>
+                    <span className={styles.eventDay}>
+                      {new Date(sched.date + 'T00:00').getDate()}
+                    </span>
+                    <span className={styles.eventMonth}>
+                      {new Date(sched.date + 'T00:00').toLocaleDateString('de-DE', { month: 'short' })}
+                    </span>
+                  </div>
+                  <div className={styles.eventBody}>
+                    <span className={styles.eventTitle}>{item?.title || 'Unbekannt'}</span>
+                    <div className={styles.eventMeta}>
+                      <span>{sched.time}</span>
+                      <span
+                        className={styles.eventStatus}
+                        style={{ background: statusBg(sched.status) }}
+                      >
+                        {STATUS_LABELS[sched.status]}
+                      </span>
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </aside>
+      )}
 
-      <CalendarGrid
-        year={year}
-        month={month}
-        scheduled={state.scheduled}
-        selectedDate={selectedDate}
-        onDayClick={(d) => setSelectedDate(d)}
-      />
+      <section className={styles.main}>
+        <div className={styles.monthNav}>
+          <button className={styles.navBtn} onClick={prevMonth} aria-label="Vorheriger Monat">‹</button>
+          <h1 className={styles.monthTitle}>{formatMonthDE(year, month)}</h1>
+          <button className={styles.navBtn} onClick={nextMonth} aria-label="Nächster Monat">›</button>
+        </div>
 
-      {selectedDate && (
-        <div className={styles.dayPanel}>
-          <h2 className={styles.dayTitle}>{formatDateDE(selectedDate)}</h2>
-          {dayExposures.length === 0 ? (
-            <p className={styles.noExposures}>Keine Expositionen geplant.</p>
-          ) : (
+        <CalendarGrid
+          year={year}
+          month={month}
+          scheduled={state.scheduled}
+          selectedDate={selectedDate}
+          onDayClick={(d) => setSelectedDate(d)}
+        />
+
+        <button className={styles.scheduleBtn} onClick={openScheduleModal}>
+          + Exposition planen {selectedDate ? `(${formatDateDE(selectedDate)})` : ''}
+        </button>
+
+        {selectedDate && dayExposures.length > 0 && (
+          <div className={styles.dayPanel}>
+            <h2 className={styles.dayTitle}>{formatDateDE(selectedDate)}</h2>
             <ul className={styles.exposureList}>
               {dayExposures.map((sched) => (
                 <li key={sched.id} className={styles.exposureItem}>
@@ -102,37 +167,18 @@ export default function CalendarPage() {
                     <span className={styles.exposureTitle}>{getItemTitle(sched.itemId)}</span>
                     <span className={styles.exposureTime}>{sched.time}</span>
                   </div>
-                  <span
-                    className={styles.statusBadge}
-                    style={{ background: statusBg(sched.status) }}
+                  <button
+                    className={styles.logBtn}
+                    onClick={() => router.push(`/log/${sched.id}`)}
                   >
-                    {STATUS_LABELS[sched.status]}
-                  </span>
-                  {sched.status === 'planned' && (
-                    <button
-                      className={styles.logBtn}
-                      onClick={() => router.push(`/log/${sched.id}`)}
-                    >
-                      Loggen
-                    </button>
-                  )}
-                  {sched.status === 'completed' && (
-                    <button
-                      className={styles.viewBtn}
-                      onClick={() => router.push(`/log/${sched.id}`)}
-                    >
-                      Ansehen
-                    </button>
-                  )}
+                    Öffnen
+                  </button>
                 </li>
               ))}
             </ul>
-          )}
-          <button className={styles.scheduleBtn} onClick={openScheduleModal}>
-            + Exposition planen
-          </button>
-        </div>
-      )}
+          </div>
+        )}
+      </section>
 
       <Modal
         isOpen={showScheduleModal}

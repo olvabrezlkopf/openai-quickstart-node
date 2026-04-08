@@ -18,7 +18,7 @@ export default function PlanInterviewModal({ isOpen, onClose, onPlanGenerated })
       setInput('');
       setError(null);
       setPhase('interview');
-      setQuestionInfo({ current: 0, max: 10 });
+      setQuestionInfo({ current: 0, max: 5 });
       // Fetch the first question automatically
       fetchNextQuestion([]);
     }

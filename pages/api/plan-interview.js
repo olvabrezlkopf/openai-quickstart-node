@@ -1,23 +1,23 @@
 import Anthropic from '@anthropic-ai/sdk';
 
 const MODEL = 'claude-sonnet-4-6';
-const MAX_QUESTIONS = 10;
+const MAX_QUESTIONS = 5;
 
 const INTERVIEW_SYSTEM = `Du bist ein einfühlsamer Coach, der Menschen hilft, eine persönliche Expositionshierarchie (Angstleiter) für ihre Ängste aufzubauen. Dies ist KEIN Therapieersatz, sondern ein Selbstcoaching-Tool.
 
-Deine Aufgabe: Führe ein kurzes, fokussiertes Interview (maximal ${MAX_QUESTIONS} Fragen) mit dem Nutzer auf DEUTSCH, um zu verstehen:
-1. Welche Angst/Situation vermeidet der Nutzer?
-2. Wie sieht der aktuelle Alltag aus? Was ist das Ziel?
-3. Welche konkreten Situationen lösen Angst aus (von leicht bis schwer)?
-4. Welche Ressourcen (Begleitung, Atemübungen, sichere Orte) gibt es?
-5. Wie viel Zeit kann pro Woche investiert werden?
+Deine Aufgabe: Führe ein sehr kurzes, fokussiertes Interview mit GENAU ${MAX_QUESTIONS} Fragen mit dem Nutzer auf DEUTSCH. Decke in diesen ${MAX_QUESTIONS} Fragen ab:
+1. Welche Angst/Situation vermeidet der Nutzer? Was ist das Ziel?
+2. Welche konkreten Situationen lösen Angst aus (leicht bis schwer)?
+3. Welche Ressourcen (Begleitung, Atemübungen, sichere Orte) gibt es?
+4. Wie viel Zeit kann pro Woche investiert werden?
+5. Was hilft dem Nutzer, im Moment bei sich zu bleiben?
 
 WICHTIGE REGELN:
 - Stelle IMMER NUR EINE Frage pro Nachricht
 - Halte Fragen kurz, warmherzig und konkret
-- Antworte ausschließlich mit der nächsten Frage (keine Einleitungen, keine Erklärungen)
-- Keine Meta-Kommentare ("Gute Frage", "Verstanden", etc.)
-- Nach der letzten Frage stoppst du - der Nutzer wird dann den Plan generieren lassen`;
+- Antworte ausschließlich mit der Frage selbst (keine Einleitungen, keine Erklärungen, keine Meta-Kommentare wie "Gute Frage", "Verstanden")
+- Biete dem Nutzer NIEMALS an, den Plan zu erstellen. Das übernimmt die App.
+- Stelle keine Abschlussfloskeln oder Zusammenfassungen — nur Fragen.`;
 
 const GENERATE_SYSTEM = `Du bist ein Experte für graduelle Exposition. Basierend auf dem vorangegangenen Interview erstelle jetzt einen vollständigen, personalisierten Expositionsplan.
 
@@ -117,7 +117,7 @@ export default async function handler(req, res) {
     if (mode === 'generate') {
       const response = await client.messages.create({
         model: MODEL,
-        max_tokens: 4000,
+        max_tokens: 16000,
         system: GENERATE_SYSTEM,
         messages: [
           ...messages,
@@ -128,12 +128,17 @@ export default async function handler(req, res) {
         ],
       });
 
+      if (response.stop_reason === 'max_tokens') {
+        return res.status(500).json({
+          error: 'Antwort wurde abgeschnitten (max_tokens erreicht). Bitte erneut versuchen.',
+        });
+      }
+
       const text = response.content
         .filter((c) => c.type === 'text')
         .map((c) => c.text)
         .join('');
 
-      // Extract JSON from response
       const jsonStart = text.indexOf('{');
       const jsonEnd = text.lastIndexOf('}');
       if (jsonStart === -1 || jsonEnd === -1) {
@@ -144,7 +149,10 @@ export default async function handler(req, res) {
       try {
         parsed = JSON.parse(jsonStr);
       } catch (e) {
-        return res.status(500).json({ error: 'JSON-Parsing fehlgeschlagen: ' + e.message });
+        return res.status(500).json({
+          error: 'JSON-Parsing fehlgeschlagen: ' + e.message,
+          raw: text.slice(0, 500),
+        });
       }
 
       return res.status(200).json({ plan: parsed });

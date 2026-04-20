@@ -26,10 +26,22 @@ export default function JournalPage() {
     <div>
       <Head><title>Tagebuch — Mutig</title></Head>
 
-      <h1 className={styles.title}>Tagebuch</h1>
-      <p className={styles.subtitle}>
-        Dein Beweis, dass du wächst — jeder Eintrag ist mit einer Übung verknüpft.
-      </p>
+      <div className={styles.hero}>
+        <img
+          className={styles.heroImg}
+          src="https://images.unsplash.com/photo-1455390582262-044cdead277a?w=1600&q=80&auto=format&fit=crop"
+          alt=""
+          loading="lazy"
+        />
+        <div className={styles.heroOverlay} />
+        <div className={styles.heroContent}>
+          <span className={styles.heroEyebrow}>Tagebuch</span>
+          <h1 className={styles.title}>Dein Beweis, dass du wächst.</h1>
+          <p className={styles.subtitle}>
+            Jeder Eintrag ist mit einer Übung verknüpft — damit du sehen kannst, wie weit du gekommen bist.
+          </p>
+        </div>
+      </div>
 
       {entries.length === 0 ? (
         <div className={styles.empty}>
@@ -42,8 +54,12 @@ export default function JournalPage() {
         </div>
       ) : (
         <div className={styles.entryList}>
-          {entries.map(({ journal, log, sched, item }) => (
-            <div key={journal.id} className={styles.entry}>
+          {entries.map(({ journal, log, sched, item }, idx) => (
+            <div
+              key={journal.id}
+              className={styles.entry}
+              style={{ animationDelay: `${Math.min(idx * 50, 500)}ms` }}
+            >
               <div className={styles.entryHeader}>
                 <div className={styles.entryDate}>
                   {new Date(journal.created_at).toLocaleDateString('de-DE', {

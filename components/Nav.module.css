@@ -38,7 +38,9 @@
 }
 
 .icon {
-  font-size: 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   line-height: 1;
 }
 
@@ -80,7 +82,6 @@
   }
 
   .icon {
-    font-size: 1.1rem;
     width: 24px;
     text-align: center;
   }

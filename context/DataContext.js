@@ -56,13 +56,15 @@ function reducer(state, action) {
       return { ...state, journals: { ...state.journals, [action.payload.id]: { ...state.journals[action.payload.id], ...action.payload } } };
 
     case A.IMPORT_PLAN: {
-      // Bulk-import AI-generated plan with phases and items in one go
-      const { plan, phases, items } = action.payload;
+      // Bulk-import AI-generated plan with phases, items and optionally
+      // pre-scheduled exposures in one go
+      const { plan, phases, items, scheduled } = action.payload;
       return {
         ...state,
         plans: { ...state.plans, [plan.id]: plan },
         phases: { ...state.phases, ...phases },
         items: { ...state.items, ...items },
+        scheduled: { ...state.scheduled, ...(scheduled || {}) },
       };
     }
 

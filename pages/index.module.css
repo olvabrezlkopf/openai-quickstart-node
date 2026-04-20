@@ -1,14 +1,77 @@
+.hero {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: var(--space-xl);
+  min-height: 280px;
+  box-shadow: 0 12px 40px rgba(17, 24, 39, 0.14);
+  animation: heroFade 0.8s cubic-bezier(0.19, 1, 0.22, 1) backwards;
+}
+
+.heroImg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.02);
+  transition: transform 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.hero:hover .heroImg {
+  transform: scale(1.06);
+}
+
+.heroOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(17, 24, 39, 0.7) 0%,
+    rgba(17, 24, 39, 0.4) 45%,
+    rgba(79, 70, 229, 0.35) 100%
+  );
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 280px;
+  padding: var(--space-xl);
+  color: white;
+}
+
+.heroEyebrow {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  opacity: 0.85;
+  margin-bottom: var(--space-xs);
+}
+
 .title {
-  font-size: var(--font-size-3xl);
+  font-size: clamp(2rem, 5vw, 3rem);
   font-weight: 700;
-  color: var(--color-gray-900);
-  margin-bottom: var(--space-sm);
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  margin: 0;
 }
 
 .subtitle {
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-lg);
-  margin-bottom: var(--space-xl);
+  margin-top: var(--space-sm);
+  font-size: var(--font-size-base);
+  opacity: 0.88;
+  max-width: 480px;
+  line-height: 1.5;
+}
+
+@keyframes heroFade {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .metrics {
@@ -16,6 +79,19 @@
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: var(--space-md);
   margin-bottom: var(--space-xl);
+}
+
+.metrics > * {
+  animation: metricIn 0.55s cubic-bezier(0.19, 1, 0.22, 1) backwards;
+}
+
+.metrics > *:nth-child(1) { animation-delay: 60ms; }
+.metrics > *:nth-child(2) { animation-delay: 140ms; }
+.metrics > *:nth-child(3) { animation-delay: 220ms; }
+
+@keyframes metricIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .skeleton {

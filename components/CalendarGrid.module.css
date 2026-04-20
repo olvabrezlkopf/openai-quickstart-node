@@ -28,7 +28,9 @@
   border: 2px solid transparent;
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: background 0.1s, border-color 0.1s;
+  transition: background 0.2s cubic-bezier(0.19, 1, 0.22, 1),
+              border-color 0.2s cubic-bezier(0.19, 1, 0.22, 1),
+              transform 0.2s cubic-bezier(0.19, 1, 0.22, 1);
   padding: 2px;
 }
 
@@ -52,6 +54,12 @@
 
 .selected {
   border-color: var(--color-primary);
+}
+
+.dragOver {
+  background: rgba(79, 70, 229, 0.12);
+  border-color: var(--color-primary);
+  transform: scale(1.04);
 }
 
 .dayNum {

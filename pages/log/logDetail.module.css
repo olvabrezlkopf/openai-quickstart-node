@@ -64,6 +64,11 @@
   color: var(--color-gray-600);
   font-size: var(--font-size-sm);
   width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  transition: all 0.2s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .editPreBtn:hover {

@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { Check } from '@phosphor-icons/react';
 import styles from './PlanOverview.module.css';
 
 export default function PlanOverview({ phases, items, scheduled, logs, journals, onEditItem }) {
@@ -54,6 +55,26 @@ export default function PlanOverview({ phases, items, scheduled, logs, journals,
     return result;
   }, [items, scheduled, logs, journals]);
 
+  // Earliest scheduled date per item — used for chronological sorting
+  const earliestByItem = useMemo(() => {
+    const map = {};
+    Object.values(scheduled).forEach((s) => {
+      if (!s.itemId) return;
+      const key = s.date + 'T' + (s.time || '00:00');
+      if (!map[s.itemId] || key < map[s.itemId]) map[s.itemId] = key;
+    });
+    return map;
+  }, [scheduled]);
+
+  function sortByScheduleThenPlan(a, b) {
+    const sa = earliestByItem[a.id];
+    const sb = earliestByItem[b.id];
+    if (sa && sb) return sa.localeCompare(sb);
+    if (sa && !sb) return -1;
+    if (!sa && sb) return 1;
+    return (a.week || 0) - (b.week || 0) || (a.unit || 0) - (b.unit || 0);
+  }
+
   // Group items by phase for rendering
   const phaseGroups = useMemo(() => {
     const map = new Map();
@@ -67,13 +88,12 @@ export default function PlanOverview({ phases, items, scheduled, logs, journals,
       }
     });
     for (const [, group] of map) {
-      group.items.sort((a, b) =>
-        (a.week || 0) - (b.week || 0) || (a.unit || 0) - (b.unit || 0)
-      );
+      group.items.sort(sortByScheduleThenPlan);
     }
-    unassigned.sort((a, b) => (a.suds_estimate || 0) - (b.suds_estimate || 0));
+    unassigned.sort(sortByScheduleThenPlan);
     return { phaseGroups: Array.from(map.values()), unassigned };
-  }, [phases, items]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phases, items, earliestByItem]);
 
   if (items.length === 0) {
     return <p className={styles.empty}>Noch keine Schritte angelegt.</p>;
@@ -87,6 +107,7 @@ export default function PlanOverview({ phases, items, scheduled, logs, journals,
           phase={phase}
           items={phaseItems}
           stats={stats}
+          scheduled={scheduled}
           onEditItem={onEditItem}
         />
       ))}
@@ -95,6 +116,7 @@ export default function PlanOverview({ phases, items, scheduled, logs, journals,
           phase={{ name: 'Ohne Phase' }}
           items={phaseGroups.unassigned}
           stats={stats}
+          scheduled={scheduled}
           onEditItem={onEditItem}
         />
       )}
@@ -102,7 +124,22 @@ export default function PlanOverview({ phases, items, scheduled, logs, journals,
   );
 }
 
-function PhaseTable({ phase, items, stats, onEditItem }) {
+function findEarliestDate(scheduled, itemId) {
+  let earliest = null;
+  Object.values(scheduled).forEach((s) => {
+    if (s.itemId !== itemId) return;
+    if (!earliest || s.date < earliest) earliest = s.date;
+  });
+  return earliest;
+}
+
+function formatShortDate(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr + 'T00:00');
+  return d.toLocaleDateString('de-DE', { day: '2-digit', month: 'short' });
+}
+
+function PhaseTable({ phase, items, stats, scheduled, onEditItem }) {
   if (items.length === 0) return null;
 
   return (
@@ -112,6 +149,7 @@ function PhaseTable({ phase, items, stats, onEditItem }) {
         <table className={styles.table}>
           <thead>
             <tr>
+              <th>Termin</th>
               <th>W</th>
               <th>E</th>
               <th>Situation / Übung</th>
@@ -126,8 +164,10 @@ function PhaseTable({ phase, items, stats, onEditItem }) {
           <tbody>
             {items.map((item) => {
               const s = stats[item.id] || {};
+              const nextDate = findEarliestDate(scheduled, item.id);
               return (
                 <tr key={item.id} onClick={() => onEditItem(item)} className={styles.row}>
+                  <td className={styles.small}>{formatShortDate(nextDate)}</td>
                   <td className={styles.small}>{item.week || '-'}</td>
                   <td className={styles.small}>{item.unit || '-'}</td>
                   <td>
@@ -148,7 +188,10 @@ function PhaseTable({ phase, items, stats, onEditItem }) {
                   </td>
                   <td className={styles.small}>
                     {s.completed > 0 ? (
-                      <span className={styles.doneBadge}>✓ {s.completed}×</span>
+                      <span className={styles.doneBadge}>
+                        <Check size={11} weight="bold" />
+                        {s.completed}×
+                      </span>
                     ) : (
                       <span className={styles.notDone}>—</span>
                     )}

@@ -6,8 +6,10 @@ import { useData } from '../../context/DataContext';
 import { ADD_PLAN, IMPORT_PLAN } from '../../context/actions';
 import { generateId } from '../../lib/ids';
 import { CATEGORIES } from '../../lib/constants';
+import { autoScheduleItems } from '../../lib/scheduling';
 import Modal from '../../components/Modal';
 import PlanInterviewModal from '../../components/PlanInterviewModal';
+import { Sparkle, Plus } from '@phosphor-icons/react';
 import styles from './index.module.css';
 
 export default function PlanList() {
@@ -91,7 +93,11 @@ export default function PlanList() {
       });
     });
 
-    dispatch({ type: IMPORT_PLAN, payload: { plan: newPlan, phases, items } });
+    // Auto-distribute items across upcoming weeks so the user lands
+    // in a pre-populated calendar instead of an empty one.
+    const scheduled = autoScheduleItems(items);
+
+    dispatch({ type: IMPORT_PLAN, payload: { plan: newPlan, phases, items, scheduled } });
     router.push(`/plan/${planId}`);
   }
 
@@ -104,14 +110,34 @@ export default function PlanList() {
   return (
     <div>
       <Head><title>Pläne — Mutig</title></Head>
+
+      <div className={styles.hero}>
+        <img
+          className={styles.heroImg}
+          src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1600&q=80&auto=format&fit=crop"
+          alt=""
+          loading="lazy"
+        />
+        <div className={styles.heroOverlay} />
+        <div className={styles.heroContent}>
+          <span className={styles.heroEyebrow}>Angstleitern</span>
+          <h1 className={styles.heroTitle}>Schritt für Schritt. Auf deinen eigenen Berg.</h1>
+          <p className={styles.heroSub}>
+            Lass dir von der KI einen persönlichen Plan zusammenstellen — oder beginne mit einem leeren Grundgerüst.
+          </p>
+        </div>
+      </div>
+
       <div className={styles.header}>
-        <h1 className={styles.title}>Angstleitern</h1>
+        <h2 className={styles.title}>Deine Pläne</h2>
         <div className={styles.headerActions}>
           <button className={styles.aiBtn} onClick={() => setShowAIModal(true)}>
-            ✨ Mit KI erstellen
+            <Sparkle size={18} weight="fill" />
+            <span>Mit KI erstellen</span>
           </button>
           <button className={styles.addBtn} onClick={() => setShowModal(true)}>
-            + Leerer Plan
+            <Plus size={18} weight="bold" />
+            <span>Leerer Plan</span>
           </button>
         </div>
       </div>
@@ -125,10 +151,15 @@ export default function PlanList() {
         </div>
       ) : (
         <div className={styles.grid}>
-          {plans.map((plan) => {
+          {plans.map((plan, idx) => {
             const phases = phaseCountFor(plan.id);
             return (
-              <Link key={plan.id} href={`/plan/${plan.id}`} className={styles.card}>
+              <Link
+                key={plan.id}
+                href={`/plan/${plan.id}`}
+                className={styles.card}
+                style={{ animationDelay: `${Math.min(idx * 60, 600)}ms` }}
+              >
                 <span className={styles.cardCategory}>{plan.category}</span>
                 <h2 className={styles.cardName}>{plan.name}</h2>
                 {plan.goal && <p className={styles.cardGoal}>{plan.goal}</p>}

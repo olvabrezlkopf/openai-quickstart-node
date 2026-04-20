@@ -34,9 +34,16 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--color-gray-500);
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-sm);
   padding-bottom: var(--space-sm);
   border-bottom: 1px solid var(--color-gray-200);
+}
+
+.sidebarHint {
+  font-size: 0.7rem;
+  color: var(--color-gray-400);
+  margin-bottom: var(--space-md);
+  line-height: 1.4;
 }
 
 .eventList {
@@ -48,18 +55,49 @@
 
 .eventItem {
   display: flex;
+  align-items: center;
   gap: var(--space-sm);
   padding: var(--space-sm);
   background: var(--color-bg);
   border: 1px solid var(--color-gray-100);
   border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: border-color 0.15s, transform 0.1s;
+  cursor: grab;
+  transition: border-color 0.25s cubic-bezier(0.19, 1, 0.22, 1),
+              transform 0.25s cubic-bezier(0.19, 1, 0.22, 1),
+              box-shadow 0.25s cubic-bezier(0.19, 1, 0.22, 1);
+  animation: eventFadeIn 0.5s cubic-bezier(0.19, 1, 0.22, 1) backwards;
+}
+
+.eventItem:active {
+  cursor: grabbing;
 }
 
 .eventItem:hover {
   border-color: var(--color-primary-light);
-  transform: translateX(2px);
+  transform: translateX(3px);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.08);
+}
+
+.dragging {
+  opacity: 0.4;
+  transform: scale(0.97);
+}
+
+.dragHandle {
+  display: flex;
+  align-items: center;
+  color: var(--color-gray-300);
+  flex-shrink: 0;
+  margin-right: -2px;
+}
+
+.eventItem:hover .dragHandle {
+  color: var(--color-gray-500);
+}
+
+@keyframes eventFadeIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 .eventPast {
@@ -113,8 +151,8 @@
 .eventMeta {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  margin-top: 2px;
+  gap: 6px;
+  margin-top: 3px;
   font-size: 0.7rem;
   color: var(--color-gray-500);
 }
@@ -151,11 +189,11 @@
   border-radius: var(--radius-sm);
   width: 36px;
   height: 36px;
-  font-size: 1.25rem;
   color: var(--color-gray-600);
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .navBtn:hover {
@@ -231,6 +269,16 @@
   font-weight: 600;
   font-size: var(--font-size-sm);
   width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  transition: background 0.2s cubic-bezier(0.19, 1, 0.22, 1),
+              transform 0.2s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.scheduleBtn:active {
+  transform: scale(0.98);
 }
 
 .scheduleBtn:hover {

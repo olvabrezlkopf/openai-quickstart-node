@@ -11,8 +11,10 @@ import { generateId } from '../../lib/ids';
 import { CATEGORIES } from '../../lib/constants';
 import Modal from '../../components/Modal';
 import SudsSlider from '../../components/SudsSlider';
-import ExposureItemCard from '../../components/ExposureItemCard';
 import PlanOverview from '../../components/PlanOverview';
+import {
+  MapPin, Clock, UsersThree, PencilSimple, Plus, X, CalendarPlus,
+} from '@phosphor-icons/react';
 import styles from './planDetail.module.css';
 
 const EMPTY_ITEM = {
@@ -63,6 +65,16 @@ export default function PlanDetail() {
     .sort((a, b) => a.order - b.order);
   const items = Object.values(state.items).filter((i) => i.planId === planId);
 
+  // Earliest scheduled date per item — drives chronological order
+  const earliestByItem = {};
+  Object.values(state.scheduled).forEach((s) => {
+    if (!s.itemId) return;
+    const key = s.date + 'T' + (s.time || '00:00');
+    if (!earliestByItem[s.itemId] || key < earliestByItem[s.itemId]) {
+      earliestByItem[s.itemId] = key;
+    }
+  });
+
   // Group items by phaseId
   const itemsByPhase = new Map();
   phases.forEach((p) => itemsByPhase.set(p.id, []));
@@ -71,11 +83,19 @@ export default function PlanDetail() {
     const key = item.phaseId && itemsByPhase.has(item.phaseId) ? item.phaseId : '__unassigned__';
     itemsByPhase.get(key).push(item);
   });
-  // Sort within each phase: week, unit, then suds
-  for (const [, list] of itemsByPhase) {
-    list.sort((a, b) => (a.week || 0) - (b.week || 0)
+  // Sort within each phase: scheduled date first, then week/unit as fallback
+  const sortByScheduleThenPlan = (a, b) => {
+    const sa = earliestByItem[a.id];
+    const sb = earliestByItem[b.id];
+    if (sa && sb) return sa.localeCompare(sb);
+    if (sa && !sb) return -1;
+    if (!sa && sb) return 1;
+    return (a.week || 0) - (b.week || 0)
       || (a.unit || 0) - (b.unit || 0)
-      || (a.suds_estimate || 0) - (b.suds_estimate || 0));
+      || (a.suds_estimate || 0) - (b.suds_estimate || 0);
+  };
+  for (const [, list] of itemsByPhase) {
+    list.sort(sortByScheduleThenPlan);
   }
 
   function openAddItem(phaseId = '') {
@@ -188,13 +208,22 @@ export default function PlanDetail() {
 
       <button className={styles.backLink} onClick={() => router.push('/plan')}>← Alle Pläne</button>
 
-      <div className={styles.planHeader}>
-        <div>
-          <span className={styles.category}>{plan.category}</span>
-          <h1 className={styles.planName}>{plan.name}</h1>
-          {plan.goal && <p className={styles.planGoal}>{plan.goal}</p>}
+      <div className={styles.planHero}>
+        <img
+          className={styles.planHeroImg}
+          src={heroImageFor(plan.category)}
+          alt=""
+          loading="lazy"
+        />
+        <div className={styles.planHeroOverlay} />
+        <div className={styles.planHeader}>
+          <div>
+            <span className={styles.category}>{plan.category}</span>
+            <h1 className={styles.planName}>{plan.name}</h1>
+            {plan.goal && <p className={styles.planGoal}>{plan.goal}</p>}
+          </div>
+          <button className={styles.deleteBtn} onClick={handleDeletePlan}>Plan löschen</button>
         </div>
-        <button className={styles.deleteBtn} onClick={handleDeletePlan}>Plan löschen</button>
       </div>
 
       {/* View Toggle */}
@@ -230,9 +259,11 @@ export default function PlanDetail() {
               {phases.length > 0 ? `${phases.length} Phasen · ${items.length} Schritte` : `${items.length} Schritte`}
             </h2>
             <div className={styles.headerActions}>
-              <button className={styles.secondaryBtn} onClick={openAddPhase}>+ Phase</button>
+              <button className={styles.secondaryBtn} onClick={openAddPhase}>
+                <Plus size={14} weight="bold" /> Phase
+              </button>
               <button className={styles.addBtn} onClick={() => openAddItem(phases[0]?.id || '')}>
-                + Schritt
+                <Plus size={14} weight="bold" /> Schritt
               </button>
             </div>
           </div>
@@ -251,9 +282,15 @@ export default function PlanDetail() {
                   <h3 className={styles.phaseName}>{phase.name}</h3>
                   <div className={styles.phaseActions}>
                     <span className={styles.phaseCount}>{phaseItems.length} Schritte</span>
-                    <button className={styles.phaseActionBtn} onClick={() => openAddItem(phase.id)}>+</button>
-                    <button className={styles.phaseActionBtn} onClick={() => openEditPhase(phase)}>✎</button>
-                    <button className={styles.phaseActionBtn} onClick={() => handleDeletePhase(phase)}>×</button>
+                    <button className={styles.phaseActionBtn} onClick={() => openAddItem(phase.id)} aria-label="Schritt hinzufügen">
+                      <Plus size={14} weight="bold" />
+                    </button>
+                    <button className={styles.phaseActionBtn} onClick={() => openEditPhase(phase)} aria-label="Phase bearbeiten">
+                      <PencilSimple size={14} weight="bold" />
+                    </button>
+                    <button className={styles.phaseActionBtn} onClick={() => handleDeletePhase(phase)} aria-label="Phase löschen">
+                      <X size={14} weight="bold" />
+                    </button>
                   </div>
                 </header>
                 {phaseItems.length === 0 ? (
@@ -264,6 +301,7 @@ export default function PlanDetail() {
                       <ItemRow
                         key={item.id}
                         item={item}
+                        scheduleDate={formatScheduleKey(earliestByItem[item.id])}
                         onEdit={() => openEditItem(item)}
                         onSchedule={() => handleSchedule(item)}
                       />
@@ -287,6 +325,7 @@ export default function PlanDetail() {
                   <ItemRow
                     key={item.id}
                     item={item}
+                    scheduleDate={formatScheduleKey(earliestByItem[item.id])}
                     onEdit={() => openEditItem(item)}
                     onSchedule={() => handleSchedule(item)}
                   />
@@ -498,11 +537,14 @@ export default function PlanDetail() {
   );
 }
 
-function ItemRow({ item, onEdit, onSchedule }) {
+function ItemRow({ item, onEdit, onSchedule, scheduleDate }) {
   return (
     <div className={styles.itemRow}>
       <div className={styles.itemMeta}>
-        {(item.week || item.unit) && (
+        {scheduleDate && (
+          <span className={styles.weekUnit}>{scheduleDate}</span>
+        )}
+        {!scheduleDate && (item.week || item.unit) && (
           <span className={styles.weekUnit}>W{item.week || '?'}·E{item.unit || '?'}</span>
         )}
         <span className={styles.sudsPill} style={{ background: sudsColor(item.suds_estimate) }}>
@@ -512,17 +554,27 @@ function ItemRow({ item, onEdit, onSchedule }) {
       <div className={styles.itemContent}>
         <h4 className={styles.itemTitle}>{item.title}</h4>
         <div className={styles.itemInlineInfo}>
-          {item.ort && <span>📍 {item.ort}</span>}
-          {item.dauer && <span>⏱ {item.dauer}</span>}
-          {item.begleitung && <span>👤 {item.begleitung}</span>}
+          {item.ort && (
+            <span><MapPin size={12} weight="fill" /> {item.ort}</span>
+          )}
+          {item.dauer && (
+            <span><Clock size={12} weight="fill" /> {item.dauer}</span>
+          )}
+          {item.begleitung && (
+            <span><UsersThree size={12} weight="fill" /> {item.begleitung}</span>
+          )}
         </div>
         {item.fokus_beiMir && (
           <p className={styles.itemFocus}><strong>Fokus:</strong> {item.fokus_beiMir}</p>
         )}
       </div>
       <div className={styles.itemActions}>
-        <button className={styles.btnSmall} onClick={onEdit}>✎</button>
-        <button className={`${styles.btnSmall} ${styles.btnPrimary}`} onClick={onSchedule}>Planen</button>
+        <button className={styles.btnSmall} onClick={onEdit} aria-label="Bearbeiten">
+          <PencilSimple size={14} weight="bold" />
+        </button>
+        <button className={`${styles.btnSmall} ${styles.btnPrimary}`} onClick={onSchedule}>
+          Planen
+        </button>
       </div>
     </div>
   );
@@ -532,4 +584,24 @@ function sudsColor(val) {
   if (val <= 3) return 'var(--color-suds-0)';
   if (val <= 6) return 'var(--color-suds-5)';
   return 'var(--color-suds-10)';
+}
+
+function formatScheduleKey(key) {
+  if (!key) return null;
+  const [dateStr] = key.split('T');
+  const d = new Date(dateStr + 'T00:00');
+  return d.toLocaleDateString('de-DE', { day: '2-digit', month: 'short' });
+}
+
+const HERO_BY_CATEGORY = {
+  'Soziale Angst': 'https://images.unsplash.com/photo-1543007630-9710e4a00a20?w=1600&q=80&auto=format&fit=crop',
+  'Höhenangst': 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1600&q=80&auto=format&fit=crop',
+  'Agoraphobie': 'https://images.unsplash.com/photo-1494522855154-9297ac14b55f?w=1600&q=80&auto=format&fit=crop',
+  'Reiseangst': 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1600&q=80&auto=format&fit=crop',
+  'Spezifische Phobie': 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1600&q=80&auto=format&fit=crop',
+  'Andere': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80&auto=format&fit=crop',
+};
+
+function heroImageFor(category) {
+  return HERO_BY_CATEGORY[category] || HERO_BY_CATEGORY['Andere'];
 }

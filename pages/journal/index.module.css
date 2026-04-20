@@ -1,13 +1,76 @@
-.title {
-  font-size: var(--font-size-2xl);
-  font-weight: 700;
+.hero {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: var(--space-xl);
+  min-height: 220px;
+  box-shadow: 0 10px 36px rgba(17, 24, 39, 0.14);
+  animation: journalHero 0.8s cubic-bezier(0.19, 1, 0.22, 1) backwards;
+}
+
+.heroImg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.02);
+  transition: transform 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.hero:hover .heroImg {
+  transform: scale(1.05);
+}
+
+.heroOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(17, 24, 39, 0.65) 0%,
+    rgba(17, 24, 39, 0.4) 50%,
+    rgba(16, 185, 129, 0.25) 100%
+  );
+}
+
+.heroContent {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 220px;
+  padding: var(--space-xl);
+  color: white;
+}
+
+.heroEyebrow {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  opacity: 0.85;
   margin-bottom: var(--space-xs);
 }
 
+.title {
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
 .subtitle {
-  color: var(--color-text-secondary);
-  margin-bottom: var(--space-xl);
+  margin-top: var(--space-sm);
+  color: white;
+  opacity: 0.9;
+  max-width: 480px;
   font-size: var(--font-size-base);
+  line-height: 1.5;
+}
+
+@keyframes journalHero {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Empty state */
@@ -57,7 +120,22 @@
   padding: var(--space-lg);
   background: var(--color-bg);
   border: 1px solid var(--color-gray-200);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
+  animation: entryIn 0.55s cubic-bezier(0.19, 1, 0.22, 1) backwards;
+  transition: box-shadow 0.3s cubic-bezier(0.19, 1, 0.22, 1),
+              transform 0.3s cubic-bezier(0.19, 1, 0.22, 1),
+              border-color 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.entry:hover {
+  box-shadow: 0 8px 24px rgba(17, 24, 39, 0.06);
+  transform: translateY(-1px);
+  border-color: var(--color-gray-300);
+}
+
+@keyframes entryIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .entryHeader {

@@ -9,6 +9,7 @@ import { MOODS } from '../../lib/constants';
 import SudsSlider from '../../components/SudsSlider';
 import DifficultyStars from '../../components/DifficultyStars';
 import MoodPicker from '../../components/MoodPicker';
+import { PencilSimple } from '@phosphor-icons/react';
 import styles from './logDetail.module.css';
 
 export default function LogPage() {
@@ -269,7 +270,7 @@ export default function LogPage() {
             <strong>{elapsedMin} min</strong>
           </div>
           <button type="button" className={styles.editPreBtn} onClick={() => setEditingPre(true)}>
-            ✎ Pre-Werte anpassen
+            <PencilSimple size={14} weight="bold" /> Pre-Werte anpassen
           </button>
         </div>
 

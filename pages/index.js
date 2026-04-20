@@ -37,8 +37,23 @@ export default function Dashboard() {
       <Head>
         <title>Mutig — Dein Expositions-Coach</title>
       </Head>
-      <h1 className={styles.title}>Dashboard</h1>
-      <p className={styles.subtitle}>Dein persönlicher Angst-Coach</p>
+
+      <div className={styles.hero}>
+        <img
+          className={styles.heroImg}
+          src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=80&auto=format&fit=crop"
+          alt=""
+          loading="lazy"
+        />
+        <div className={styles.heroOverlay} />
+        <div className={styles.heroContent}>
+          <span className={styles.heroEyebrow}>Mutig</span>
+          <h1 className={styles.title}>Dein Weg. Dein Tempo.</h1>
+          <p className={styles.subtitle}>
+            Kleine Schritte, klare Spuren. Schau dir an, wo du stehst — und was als nächstes dran ist.
+          </p>
+        </div>
+      </div>
 
       {!hasData ? (
         <div className={styles.emptyState}>

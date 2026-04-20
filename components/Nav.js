@@ -1,12 +1,18 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import {
+  House,
+  ListBullets,
+  CalendarBlank,
+  NotePencil,
+} from '@phosphor-icons/react';
 import styles from './Nav.module.css';
 
 const NAV_ITEMS = [
-  { href: '/', label: 'Dashboard', icon: '◈' },
-  { href: '/plan', label: 'Pläne', icon: '☰' },
-  { href: '/calendar', label: 'Kalender', icon: '▦' },
-  { href: '/journal', label: 'Tagebuch', icon: '✎' },
+  { href: '/', label: 'Dashboard', Icon: House },
+  { href: '/plan', label: 'Pläne', Icon: ListBullets },
+  { href: '/calendar', label: 'Kalender', Icon: CalendarBlank },
+  { href: '/journal', label: 'Tagebuch', Icon: NotePencil },
 ];
 
 export default function Nav() {
@@ -15,18 +21,20 @@ export default function Nav() {
   return (
     <nav className={styles.nav}>
       <div className={styles.brand}>Mutig</div>
-      {NAV_ITEMS.map((item) => {
-        const isActive = item.href === '/'
+      {NAV_ITEMS.map(({ href, label, Icon }) => {
+        const isActive = href === '/'
           ? router.pathname === '/'
-          : router.pathname.startsWith(item.href);
+          : router.pathname.startsWith(href);
         return (
           <Link
-            key={item.href}
-            href={item.href}
+            key={href}
+            href={href}
             className={`${styles.link} ${isActive ? styles.active : ''}`}
           >
-            <span className={styles.icon}>{item.icon}</span>
-            <span className={styles.label}>{item.label}</span>
+            <span className={styles.icon}>
+              <Icon size={22} weight={isActive ? 'fill' : 'regular'} />
+            </span>
+            <span className={styles.label}>{label}</span>
           </Link>
         );
       })}

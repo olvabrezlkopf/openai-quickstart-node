@@ -2,12 +2,13 @@ import Head from 'next/head';
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { useData } from '../../context/DataContext';
-import { SCHEDULE_EXPOSURE } from '../../context/actions';
+import { SCHEDULE_EXPOSURE, UPDATE_SCHEDULE } from '../../context/actions';
 import { generateId } from '../../lib/ids';
 import { formatMonthDE, toDateString, formatDateDE } from '../../lib/dates';
 import { STATUS_LABELS } from '../../lib/constants';
 import CalendarGrid from '../../components/CalendarGrid';
 import Modal from '../../components/Modal';
+import { CaretLeft, CaretRight, Plus, DotsSixVertical, Clock } from '@phosphor-icons/react';
 import styles from './index.module.css';
 
 export default function CalendarPage() {
@@ -21,12 +22,12 @@ export default function CalendarPage() {
   const [selectedItemId, setSelectedItemId] = useState('');
   const [schedTime, setSchedTime] = useState('10:00');
   const [schedNotes, setSchedNotes] = useState('');
+  const [draggingId, setDraggingId] = useState(null);
 
   const allScheduled = useMemo(() => {
     if (!isHydrated) return [];
     const todayStr = toDateString(new Date());
     return Object.values(state.scheduled).sort((a, b) => {
-      // Upcoming first (date >= today), then past
       const aIsUpcoming = a.date >= todayStr;
       const bIsUpcoming = b.date >= todayStr;
       if (aIsUpcoming && !bIsUpcoming) return -1;
@@ -63,10 +64,7 @@ export default function CalendarPage() {
   }
 
   function openScheduleModal() {
-    if (!selectedDate) {
-      // Default to today if nothing selected
-      setSelectedDate(new Date());
-    }
+    if (!selectedDate) setSelectedDate(new Date());
     setSelectedItemId(preselectedItemId || Object.keys(state.items)[0] || '');
     setSchedTime('10:00');
     setSchedNotes('');
@@ -90,6 +88,26 @@ export default function CalendarPage() {
     setShowScheduleModal(false);
   }
 
+  // --- Drag & drop rescheduling ---
+  function handleDragStart(e, schedId) {
+    e.dataTransfer.setData('text/plain', schedId);
+    e.dataTransfer.effectAllowed = 'move';
+    setDraggingId(schedId);
+  }
+
+  function handleDragEnd() {
+    setDraggingId(null);
+  }
+
+  function handleDropOnDay(schedId, newDate) {
+    const existing = state.scheduled[schedId];
+    if (!existing || existing.date === newDate) return;
+    dispatch({
+      type: UPDATE_SCHEDULE,
+      payload: { id: schedId, date: newDate },
+    });
+  }
+
   const allItems = Object.values(state.items);
   const todayStr = toDateString(new Date());
 
@@ -100,17 +118,26 @@ export default function CalendarPage() {
       {hasEvents && (
         <aside className={styles.sidebar}>
           <h2 className={styles.sidebarTitle}>Termine</h2>
+          <p className={styles.sidebarHint}>Ziehe Termine auf einen anderen Tag, um sie zu verschieben.</p>
           <ul className={styles.eventList}>
-            {allScheduled.map((sched) => {
+            {allScheduled.map((sched, idx) => {
               const item = state.items[sched.itemId];
               const isToday = sched.date === todayStr;
               const isPast = sched.date < todayStr;
+              const isDragging = draggingId === sched.id;
               return (
                 <li
                   key={sched.id}
-                  className={`${styles.eventItem} ${isPast ? styles.eventPast : ''} ${isToday ? styles.eventToday : ''}`}
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, sched.id)}
+                  onDragEnd={handleDragEnd}
+                  className={`${styles.eventItem} ${isPast ? styles.eventPast : ''} ${isToday ? styles.eventToday : ''} ${isDragging ? styles.dragging : ''}`}
+                  style={{ animationDelay: `${Math.min(idx * 30, 600)}ms` }}
                   onClick={() => router.push(`/log/${sched.id}`)}
                 >
+                  <span className={styles.dragHandle} aria-hidden="true">
+                    <DotsSixVertical size={14} weight="bold" />
+                  </span>
                   <div className={styles.eventDate}>
                     <span className={styles.eventDay}>
                       {new Date(sched.date + 'T00:00').getDate()}
@@ -122,6 +149,7 @@ export default function CalendarPage() {
                   <div className={styles.eventBody}>
                     <span className={styles.eventTitle}>{item?.title || 'Unbekannt'}</span>
                     <div className={styles.eventMeta}>
+                      <Clock size={11} weight="bold" />
                       <span>{sched.time}</span>
                       <span
                         className={styles.eventStatus}
@@ -140,9 +168,13 @@ export default function CalendarPage() {
 
       <section className={styles.main}>
         <div className={styles.monthNav}>
-          <button className={styles.navBtn} onClick={prevMonth} aria-label="Vorheriger Monat">‹</button>
+          <button className={styles.navBtn} onClick={prevMonth} aria-label="Vorheriger Monat">
+            <CaretLeft size={18} weight="bold" />
+          </button>
           <h1 className={styles.monthTitle}>{formatMonthDE(year, month)}</h1>
-          <button className={styles.navBtn} onClick={nextMonth} aria-label="Nächster Monat">›</button>
+          <button className={styles.navBtn} onClick={nextMonth} aria-label="Nächster Monat">
+            <CaretRight size={18} weight="bold" />
+          </button>
         </div>
 
         <CalendarGrid
@@ -151,10 +183,12 @@ export default function CalendarPage() {
           scheduled={state.scheduled}
           selectedDate={selectedDate}
           onDayClick={(d) => setSelectedDate(d)}
+          onDropOnDay={handleDropOnDay}
         />
 
         <button className={styles.scheduleBtn} onClick={openScheduleModal}>
-          + Exposition planen {selectedDate ? `(${formatDateDE(selectedDate)})` : ''}
+          <Plus size={16} weight="bold" />
+          <span>Exposition planen {selectedDate ? `(${formatDateDE(selectedDate)})` : ''}</span>
         </button>
 
         {selectedDate && dayExposures.length > 0 && (

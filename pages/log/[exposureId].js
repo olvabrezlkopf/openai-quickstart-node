@@ -3,8 +3,10 @@ import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useData } from '../../context/DataContext';
-import { ADD_LOG, UPDATE_LOG, UPDATE_SCHEDULE, ADD_JOURNAL, UPDATE_JOURNAL } from '../../context/actions';
+import { ADD_LOG, UPDATE_LOG, UPDATE_SCHEDULE, ADD_JOURNAL, UPDATE_JOURNAL, ADD_ITEM, SCHEDULE_EXPOSURE } from '../../context/actions';
 import { generateId } from '../../lib/ids';
+import { nextMonday } from '../../lib/scheduling';
+import { toDateString } from '../../lib/dates';
 import { MOODS } from '../../lib/constants';
 import SudsSlider from '../../components/SudsSlider';
 import DifficultyStars from '../../components/DifficultyStars';
@@ -35,6 +37,8 @@ export default function LogPage() {
   const [gutAngefuehlt, setGutAngefuehlt] = useState('');
   const [zielNaechste, setZielNaechste] = useState('');
   const [mood, setMood] = useState(2);
+  const [goalCreated, setGoalCreated] = useState(false);
+  const [goalCreating, setGoalCreating] = useState(false);
 
   const existingLog = isHydrated && exposureId
     ? Object.values(state.logs).find((l) => l.schedId === exposureId)
@@ -170,7 +174,75 @@ export default function LogPage() {
         },
       });
     }
+
+    if (zielNaechste.trim() && !goalCreated) {
+      autoCreateGoal(zielNaechste.trim());
+    }
+
     setJournalMode(false);
+  }
+
+  async function autoCreateGoal(goalText) {
+    const currentItem = state.items[scheduled.itemId];
+    const phase = currentItem?.phaseId ? state.phases[currentItem.phaseId] : null;
+    const plan = phase ? state.plans[phase.planId] : (currentItem?.planId ? state.plans[currentItem.planId] : null);
+    if (!plan) return;
+
+    const planItems = Object.values(state.items)
+      .filter((i) => i.planId === plan.id)
+      .slice(0, 5);
+
+    setGoalCreating(true);
+    try {
+      const res = await fetch('/api/journal-goal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          goalText,
+          planName: plan.name,
+          category: plan.category,
+          existingItems: planItems.map((i) => ({ title: i.title, suds_estimate: i.suds_estimate, difficulty: i.difficulty })),
+        }),
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+
+      const maxWeek = Math.max(...planItems.map((i) => i.week || 0), 0);
+      const newItemId = generateId();
+      dispatch({
+        type: ADD_ITEM,
+        payload: {
+          id: newItemId,
+          planId: plan.id,
+          phaseId: phase?.id || null,
+          title: data.title,
+          description: data.description || '',
+          suds_estimate: data.suds_estimate ?? 5,
+          difficulty: data.difficulty ?? 3,
+          category: plan.category,
+          week: maxWeek + 1,
+          unit: 1,
+        },
+      });
+
+      dispatch({
+        type: SCHEDULE_EXPOSURE,
+        payload: {
+          id: generateId(),
+          itemId: newItemId,
+          date: toDateString(nextMonday(new Date())),
+          time: '10:00',
+          status: 'planned',
+          notes: '',
+        },
+      });
+
+      setGoalCreated(true);
+    } catch {
+      // silent — don't block journal save
+    } finally {
+      setGoalCreating(false);
+    }
   }
 
   function handleSkip() {
@@ -415,6 +487,17 @@ export default function LogPage() {
         <span>Vorher: {existingLog.suds_before}</span>
         <span>Nachher: {existingLog.suds_after}</span>
       </div>
+
+      {goalCreated && (
+        <div className={styles.goalBanner}>
+          Dein nächstes Ziel wurde als neue Übung erstellt und für nächste Woche eingeplant.
+        </div>
+      )}
+      {goalCreating && (
+        <div className={styles.goalBanner}>
+          Erstelle Übung aus deinem Wochenziel...
+        </div>
+      )}
 
       {existingJournal ? (
         <div className={styles.journalCard}>

@@ -101,6 +101,12 @@ body {
   }
 }
 
+@media (min-width: 1200px) {
+  body {
+    padding-right: 280px;
+  }
+}
+
 a {
   color: inherit;
   text-decoration: none;

@@ -13,8 +13,9 @@ import Modal from '../../components/Modal';
 import SudsSlider from '../../components/SudsSlider';
 import PlanOverview from '../../components/PlanOverview';
 import {
-  MapPin, Clock, UsersThree, PencilSimple, Plus, X, CalendarPlus,
+  MapPin, Clock, UsersThree, PencilSimple, Plus, X, CalendarPlus, FilePdf,
 } from '@phosphor-icons/react';
+import { exportPlanPdf } from '../../lib/exports';
 import styles from './planDetail.module.css';
 
 const EMPTY_ITEM = {
@@ -222,7 +223,12 @@ export default function PlanDetail() {
             <h1 className={styles.planName}>{plan.name}</h1>
             {plan.goal && <p className={styles.planGoal}>{plan.goal}</p>}
           </div>
-          <button className={styles.deleteBtn} onClick={handleDeletePlan}>Plan löschen</button>
+          <div className={styles.heroActions}>
+            <button className={styles.pdfBtn} onClick={() => exportPlanPdf(plan, state.phases, state.items, state.scheduled)}>
+              <FilePdf size={16} weight="bold" /> PDF
+            </button>
+            <button className={styles.deleteBtn} onClick={handleDeletePlan}>Plan löschen</button>
+          </div>
         </div>
       </div>
 

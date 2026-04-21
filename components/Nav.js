@@ -5,6 +5,7 @@ import {
   ListBullets,
   CalendarBlank,
   NotePencil,
+  ChartLineUp,
 } from '@phosphor-icons/react';
 import styles from './Nav.module.css';
 
@@ -13,6 +14,7 @@ const NAV_ITEMS = [
   { href: '/plan', label: 'Pläne', Icon: ListBullets },
   { href: '/calendar', label: 'Kalender', Icon: CalendarBlank },
   { href: '/journal', label: 'Tagebuch', Icon: NotePencil },
+  { href: '/analytics', label: 'Analytics', Icon: ChartLineUp },
 ];
 
 export default function Nav() {

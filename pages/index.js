@@ -35,7 +35,7 @@ export default function Dashboard() {
   return (
     <div>
       <Head>
-        <title>Mutig — Dein Expositions-Coach</title>
+        <title>Mutig — Dein Mut-Coach</title>
       </Head>
 
       <div className={styles.hero}>
@@ -58,7 +58,7 @@ export default function Dashboard() {
       {!hasData ? (
         <div className={styles.emptyState}>
           <p className={styles.emptyTitle}>Willkommen bei Mutig</p>
-          <p>Erstelle deinen ersten Expositionsplan und beginne deine Reise.</p>
+          <p>Erstelle deinen ersten Trainingsplan und starte deine Reise.</p>
           <Link href="/plan" className={styles.ctaButton}>Ersten Plan erstellen</Link>
         </div>
       ) : (
@@ -77,7 +77,7 @@ export default function Dashboard() {
               color="var(--color-success)"
             />
             <MetricCard
-              label="Ø SUDS-Drop"
+              label="Ø Anspannungs-Drop"
               value={avgDrop}
               unit="Punkte"
               color="var(--color-warning)"
@@ -86,7 +86,7 @@ export default function Dashboard() {
 
           {nextExposure && (
             <div className={styles.nextUp}>
-              <span className={styles.nextUpTitle}>Nächste Exposition</span>
+              <span className={styles.nextUpTitle}>Nächste Challenge</span>
               <p className={styles.nextUpItem}>
                 {state.items[nextExposure.itemId]?.title || 'Unbekannt'}
               </p>

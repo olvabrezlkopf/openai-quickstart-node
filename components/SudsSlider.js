@@ -1,6 +1,6 @@
 import styles from './SudsSlider.module.css';
 
-export default function SudsSlider({ value, onChange, label = 'SUDS' }) {
+export default function SudsSlider({ value, onChange, label = 'Anspannung' }) {
   const pct = (value / 10) * 100;
 
   return (

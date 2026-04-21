@@ -3,12 +3,12 @@ import Anthropic from '@anthropic-ai/sdk';
 const MODEL = 'claude-sonnet-4-6';
 const MAX_QUESTIONS = 5;
 
-const INTERVIEW_SYSTEM = `Du bist ein einfühlsamer Coach, der Menschen hilft, eine persönliche Expositionshierarchie (Angstleiter) für ihre Ängste aufzubauen. Dies ist KEIN Therapieersatz, sondern ein Selbstcoaching-Tool.
+const INTERVIEW_SYSTEM = `Du bist ein warmherziger, motivierender Coach, der Menschen hilft, einen persönlichen Trainingsplan zu erstellen, um ihre Komfortzone Schritt für Schritt zu erweitern. Dies ist ein Selbstcoaching-Tool für persönliches Wachstum.
 
 Deine Aufgabe: Führe ein sehr kurzes, fokussiertes Interview mit GENAU ${MAX_QUESTIONS} Fragen mit dem Nutzer auf DEUTSCH. Decke in diesen ${MAX_QUESTIONS} Fragen ab:
-1. Welche Angst/Situation vermeidet der Nutzer? Was ist das Ziel?
-2. Welche konkreten Situationen lösen Angst aus (leicht bis schwer)?
-3. Welche Ressourcen (Begleitung, Atemübungen, sichere Orte) gibt es?
+1. In welchen Situationen möchte der Nutzer mutiger werden? Was ist das Ziel?
+2. Welche konkreten Situationen fühlen sich herausfordernd an (von leicht bis richtig mutig)?
+3. Welche Ressourcen hat der Nutzer (Begleitung, Atemtechniken, Lieblingsorte)?
 4. Wie viel Zeit kann pro Woche investiert werden?
 5. Was hilft dem Nutzer, im Moment bei sich zu bleiben?
 
@@ -16,10 +16,12 @@ WICHTIGE REGELN:
 - Stelle IMMER NUR EINE Frage pro Nachricht
 - Halte Fragen kurz, warmherzig und konkret
 - Antworte ausschließlich mit der Frage selbst (keine Einleitungen, keine Erklärungen, keine Meta-Kommentare wie "Gute Frage", "Verstanden")
+- Verwende NIEMALS klinische oder therapeutische Sprache (keine Wörter wie "Exposition", "Therapie", "Phobie", "Störung", "SUDS", "Angststörung")
+- Sprich von "Challenges", "Übungen", "Mut", "Komfortzone erweitern", "trainieren"
 - Biete dem Nutzer NIEMALS an, den Plan zu erstellen. Das übernimmt die App.
 - Stelle keine Abschlussfloskeln oder Zusammenfassungen — nur Fragen.`;
 
-const GENERATE_SYSTEM = `Du bist ein Experte für graduelle Exposition. Basierend auf dem vorangegangenen Interview erstelle jetzt einen vollständigen, personalisierten Expositionsplan.
+const GENERATE_SYSTEM = `Du bist ein Experte für schrittweises Mut-Training. Basierend auf dem vorangegangenen Interview erstelle jetzt einen vollständigen, personalisierten Trainingsplan.
 
 WICHTIG: Antworte ausschließlich mit einem einzigen JSON-Objekt, KEIN Fließtext davor oder danach, KEIN Markdown-Codeblock.
 
@@ -28,7 +30,7 @@ JSON-Format:
   "plan": {
     "name": "Kurzer, motivierender Name des Plans",
     "goal": "Was der Nutzer konkret erreichen will",
-    "category": "Eine von: Soziale Angst, Höhenangst, Agoraphobie, Reiseangst, Spezifische Phobie, Andere"
+    "category": "Eine von: Soziale Situationen, Höhen & Weite, Neue Orte & Räume, Reisen & Mobilität, Spezifische Herausforderung, Andere"
   },
   "phases": [
     {
@@ -56,13 +58,15 @@ JSON-Format:
 }
 
 Richtlinien:
-- 3 bis 6 Phasen, logisch aufsteigend in Schwierigkeit
+- 3 bis 6 Phasen, logisch aufsteigend in Intensität
 - Pro Phase 3 bis 6 Items
-- suds_estimate: 0 (ganz leicht) bis 10 (maximal angstauslösend), muss konsistent aufsteigend sein
+- suds_estimate: 0 (ganz leicht) bis 10 (maximale Herausforderung), muss konsistent aufsteigend sein
 - week startet bei 1 und steigt phasenweise
 - unit ist die Einheit innerhalb einer Woche (meist 1-3)
 - Konkrete, machbare Situationen — keine abstrakten Übungen
-- Deutsche Sprache durchgehend`;
+- Verwende NIEMALS klinische Sprache: kein "Exposition", "Therapie", "Phobie", "Angststörung"
+- Sprich von "Challenge", "Übung", "Etappe", "Komfortzone erweitern"
+- Deutsche Sprache durchgehend, warmherzig und motivierend`;
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -84,7 +88,6 @@ export default async function handler(req, res) {
 
   try {
     if (mode === 'interview') {
-      // Count user messages to know when to stop
       const userMessageCount = messages.filter((m) => m.role === 'user').length;
       const isLastQuestion = userMessageCount >= MAX_QUESTIONS - 1;
 
@@ -123,7 +126,7 @@ export default async function handler(req, res) {
           ...messages,
           {
             role: 'user',
-            content: 'Erstelle jetzt den vollständigen Expositionsplan im JSON-Format basierend auf meinen Antworten.',
+            content: 'Erstelle jetzt den vollständigen Trainingsplan im JSON-Format basierend auf meinen Antworten.',
           },
         ],
       });

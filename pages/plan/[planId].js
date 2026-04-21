@@ -232,7 +232,7 @@ export default function PlanDetail() {
           className={`${styles.toggleBtn} ${view === 'ladder' ? styles.toggleActive : ''}`}
           onClick={() => setView('ladder')}
         >
-          Angstleiter
+          Mutleiter
         </button>
         <button
           className={`${styles.toggleBtn} ${view === 'overview' ? styles.toggleActive : ''}`}
@@ -270,7 +270,7 @@ export default function PlanDetail() {
 
           {phases.length === 0 && items.length === 0 && (
             <p className={styles.emptyText}>
-              Noch keine Schritte. Füge Phasen hinzu um deine Angstleiter zu strukturieren oder Schritte direkt anzulegen.
+              Noch keine Schritte. Füge Phasen hinzu, um deine Mutleiter zu strukturieren, oder lege Schritte direkt an.
             </p>
           )}
 
@@ -427,7 +427,7 @@ export default function PlanDetail() {
           <SudsSlider
             value={form.suds_estimate}
             onChange={(v) => setForm({ ...form, suds_estimate: v })}
-            label="Erwartete Schwierigkeit (0-10)"
+            label="Erwartete Anspannung (0 = leicht, 10 = max)"
           />
 
           <div className={styles.formRow}>
@@ -594,11 +594,11 @@ function formatScheduleKey(key) {
 }
 
 const HERO_BY_CATEGORY = {
-  'Soziale Angst': 'https://images.unsplash.com/photo-1543007630-9710e4a00a20?w=1600&q=80&auto=format&fit=crop',
-  'Höhenangst': 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1600&q=80&auto=format&fit=crop',
-  'Agoraphobie': 'https://images.unsplash.com/photo-1494522855154-9297ac14b55f?w=1600&q=80&auto=format&fit=crop',
-  'Reiseangst': 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1600&q=80&auto=format&fit=crop',
-  'Spezifische Phobie': 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1600&q=80&auto=format&fit=crop',
+  'Soziale Situationen': 'https://images.unsplash.com/photo-1543007630-9710e4a00a20?w=1600&q=80&auto=format&fit=crop',
+  'Höhen & Weite': 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1600&q=80&auto=format&fit=crop',
+  'Neue Orte & Räume': 'https://images.unsplash.com/photo-1494522855154-9297ac14b55f?w=1600&q=80&auto=format&fit=crop',
+  'Reisen & Mobilität': 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1600&q=80&auto=format&fit=crop',
+  'Spezifische Herausforderung': 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1600&q=80&auto=format&fit=crop',
   'Andere': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80&auto=format&fit=crop',
 };
 

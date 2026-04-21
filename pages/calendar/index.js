@@ -188,7 +188,7 @@ export default function CalendarPage() {
 
         <button className={styles.scheduleBtn} onClick={openScheduleModal}>
           <Plus size={16} weight="bold" />
-          <span>Exposition planen {selectedDate ? `(${formatDateDE(selectedDate)})` : ''}</span>
+          <span>Challenge planen {selectedDate ? `(${formatDateDE(selectedDate)})` : ''}</span>
         </button>
 
         {selectedDate && dayExposures.length > 0 && (
@@ -217,11 +217,11 @@ export default function CalendarPage() {
       <Modal
         isOpen={showScheduleModal}
         onClose={() => setShowScheduleModal(false)}
-        title="Exposition planen"
+        title="Challenge planen"
       >
         <form onSubmit={handleSchedule} className={styles.form}>
           <label className={styles.formLabel}>
-            Expositionsschritt
+            Übung wählen
             <select
               value={selectedItemId}
               onChange={(e) => setSelectedItemId(e.target.value)}
@@ -230,7 +230,7 @@ export default function CalendarPage() {
               {allItems.length === 0 && <option value="">Keine Schritte vorhanden</option>}
               {allItems.map((item) => (
                 <option key={item.id} value={item.id}>
-                  {item.title} (SUDS {item.suds_estimate})
+                  {item.title} (Level {item.suds_estimate})
                 </option>
               ))}
             </select>

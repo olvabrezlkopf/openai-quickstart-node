@@ -120,7 +120,7 @@ export default function PlanList() {
         />
         <div className={styles.heroOverlay} />
         <div className={styles.heroContent}>
-          <span className={styles.heroEyebrow}>Angstleitern</span>
+          <span className={styles.heroEyebrow}>Trainingspläne</span>
           <h1 className={styles.heroTitle}>Schritt für Schritt. Auf deinen eigenen Berg.</h1>
           <p className={styles.heroSub}>
             Lass dir von der KI einen persönlichen Plan zusammenstellen — oder beginne mit einem leeren Grundgerüst.

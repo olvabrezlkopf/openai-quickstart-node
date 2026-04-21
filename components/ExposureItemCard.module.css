@@ -4,11 +4,15 @@
   border-radius: var(--radius-md);
   padding: var(--space-md);
   margin-bottom: var(--space-sm);
-  transition: box-shadow 0.15s;
+  transition: box-shadow 0.3s cubic-bezier(0.19, 1, 0.22, 1),
+              transform 0.3s cubic-bezier(0.19, 1, 0.22, 1),
+              border-color 0.3s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .card:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 16px rgba(17, 24, 39, 0.06);
+  transform: translateY(-1px);
+  border-color: var(--color-gray-300);
 }
 
 .header {
@@ -19,9 +23,11 @@
 
 .suds {
   font-size: var(--font-size-2xl);
-  font-weight: 700;
+  font-weight: 800;
   min-width: 36px;
   text-align: center;
+  font-variant-numeric: tabular-nums;
+  transition: color 0.3s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .info {
@@ -37,9 +43,10 @@
 .badge {
   display: inline-block;
   font-size: 0.7rem;
+  font-weight: 500;
   background: var(--color-gray-100);
   color: var(--color-gray-600);
-  padding: 2px 8px;
+  padding: 2px 10px;
   border-radius: 99px;
 }
 
@@ -47,6 +54,7 @@
   color: var(--color-warning);
   font-size: var(--font-size-sm);
   white-space: nowrap;
+  letter-spacing: 1px;
 }
 
 .desc {
@@ -68,12 +76,20 @@
   border-radius: var(--radius-sm);
   background: var(--color-bg);
   font-size: var(--font-size-sm);
+  font-weight: 500;
   color: var(--color-gray-600);
-  transition: background 0.1s;
+  transition: background 0.2s cubic-bezier(0.19, 1, 0.22, 1),
+              border-color 0.2s cubic-bezier(0.19, 1, 0.22, 1),
+              transform 0.2s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .btn:hover {
   background: var(--color-gray-50);
+  border-color: var(--color-gray-300);
+}
+
+.btn:active {
+  transform: scale(0.97);
 }
 
 .btnPrimary {
@@ -84,4 +100,5 @@
 
 .btnPrimary:hover {
   background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
 }

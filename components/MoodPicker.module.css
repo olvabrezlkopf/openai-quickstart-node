@@ -4,11 +4,11 @@
 
 .label {
   display: block;
-  font-size: var(--font-size-sm);
+  font-size: 0.7rem;
   font-weight: 600;
-  color: var(--color-gray-600);
+  color: var(--color-gray-400);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   margin-bottom: var(--space-sm);
 }
 
@@ -24,15 +24,25 @@
   border-radius: var(--radius-md);
   padding: var(--space-sm);
   line-height: 1;
-  transition: transform 0.1s, border-color 0.1s;
+  transition: transform 0.25s cubic-bezier(0.19, 1, 0.22, 1),
+              border-color 0.25s cubic-bezier(0.19, 1, 0.22, 1),
+              box-shadow 0.25s cubic-bezier(0.19, 1, 0.22, 1),
+              background 0.25s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .mood:hover {
   transform: scale(1.15);
+  background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.mood:active {
+  transform: scale(0.95);
 }
 
 .selected {
   border-color: var(--color-primary);
   background: white;
   transform: scale(1.1);
+  box-shadow: 0 4px 16px rgba(79, 70, 229, 0.15);
 }

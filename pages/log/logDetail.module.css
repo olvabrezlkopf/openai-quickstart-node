@@ -3,17 +3,28 @@
   border: none;
   color: var(--color-primary);
   font-size: var(--font-size-sm);
+  font-weight: 500;
   padding: 0;
   margin-bottom: var(--space-lg);
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  transition: transform 0.2s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .backLink:hover {
   text-decoration: underline;
+  transform: translateX(-2px);
 }
 
 .header {
   margin-bottom: var(--space-xl);
+  animation: fadeIn 0.5s cubic-bezier(0.19, 1, 0.22, 1) both;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .phase {
@@ -24,7 +35,7 @@
   letter-spacing: 0.08em;
   background: var(--color-primary-light);
   color: white;
-  padding: 3px 10px;
+  padding: 3px 12px;
   border-radius: 99px;
   margin-bottom: var(--space-sm);
 }
@@ -37,7 +48,7 @@
   letter-spacing: 0.08em;
   background: var(--color-success);
   color: white;
-  padding: 3px 10px;
+  padding: 3px 12px;
   border-radius: 99px;
   margin-bottom: var(--space-sm);
 }
@@ -50,7 +61,7 @@
   letter-spacing: 0.08em;
   background: var(--color-warning);
   color: white;
-  padding: 3px 10px;
+  padding: 3px 12px;
   border-radius: 99px;
   margin-bottom: var(--space-sm);
 }
@@ -63,18 +74,23 @@
   border-radius: var(--radius-sm);
   color: var(--color-gray-600);
   font-size: var(--font-size-sm);
+  font-weight: 500;
   width: 100%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-xs);
-  transition: all 0.2s cubic-bezier(0.19, 1, 0.22, 1);
+  transition: all 0.25s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .editPreBtn:hover {
   background: var(--color-gray-50);
   border-color: var(--color-primary);
   color: var(--color-primary);
+}
+
+.editPreBtn:active {
+  transform: scale(0.98);
 }
 
 .infoNote {
@@ -87,9 +103,14 @@
 .journalCard {
   background: var(--color-surface);
   border: 1px solid var(--color-gray-200);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   padding: var(--space-lg);
   margin-top: var(--space-md);
+  transition: box-shadow 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.journalCard:hover {
+  box-shadow: 0 4px 16px rgba(17, 24, 39, 0.04);
 }
 
 .journalHeader {
@@ -106,7 +127,13 @@
   border: none;
   color: var(--color-primary);
   font-size: var(--font-size-sm);
+  font-weight: 500;
   text-decoration: underline;
+  transition: opacity 0.2s;
+}
+
+.editLink:hover {
+  opacity: 0.8;
 }
 
 .journalField {
@@ -117,25 +144,33 @@
 }
 
 .journalField strong {
-  color: var(--color-gray-500);
+  color: var(--color-gray-400);
   font-weight: 600;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .formInput {
   padding: var(--space-sm) var(--space-md);
   border: 1px solid var(--color-gray-200);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   font-size: var(--font-size-base);
   outline: none;
+  width: 100%;
+  transition: border-color 0.25s cubic-bezier(0.19, 1, 0.22, 1),
+              box-shadow 0.25s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .formInput:focus {
-  border-color: var(--color-primary);
+  border-color: var(--color-primary-light);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
 .title {
   font-size: var(--font-size-2xl);
   font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .desc {
@@ -147,6 +182,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
+  animation: fadeIn 0.4s cubic-bezier(0.19, 1, 0.22, 1) 0.1s both;
 }
 
 .formLabel {
@@ -161,14 +197,18 @@
 .formTextarea {
   padding: var(--space-sm) var(--space-md);
   border: 1px solid var(--color-gray-200);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   font-size: var(--font-size-base);
   outline: none;
   resize: vertical;
+  min-height: 80px;
+  transition: border-color 0.25s cubic-bezier(0.19, 1, 0.22, 1),
+              box-shadow 0.25s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .formTextarea:focus {
-  border-color: var(--color-primary);
+  border-color: var(--color-primary-light);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
 .actions {
@@ -185,10 +225,19 @@
   border-radius: var(--radius-md);
   font-size: var(--font-size-lg);
   font-weight: 700;
+  transition: background 0.2s cubic-bezier(0.19, 1, 0.22, 1),
+              transform 0.2s cubic-bezier(0.19, 1, 0.22, 1),
+              box-shadow 0.2s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .startBtn:hover {
   background: var(--color-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(79, 70, 229, 0.25);
+}
+
+.startBtn:active {
+  transform: translateY(0);
 }
 
 .skipBtn {
@@ -198,17 +247,21 @@
   border-radius: var(--radius-md);
   color: var(--color-gray-500);
   font-size: var(--font-size-sm);
+  font-weight: 500;
+  transition: background 0.2s cubic-bezier(0.19, 1, 0.22, 1),
+              border-color 0.2s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .skipBtn:hover {
   background: var(--color-gray-50);
+  border-color: var(--color-gray-400);
 }
 
 /* Post phase */
 .infoCard {
   background: var(--color-surface);
   border: 1px solid var(--color-gray-200);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   padding: var(--space-md);
   margin-bottom: var(--space-xl);
 }
@@ -239,6 +292,12 @@
   border-radius: 99px;
   font-weight: 600;
   font-size: var(--font-size-sm);
+  transition: background 0.25s cubic-bezier(0.19, 1, 0.22, 1),
+              transform 0.15s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.toggle:active {
+  transform: scale(0.95);
 }
 
 .toggleOn {
@@ -259,19 +318,29 @@
   border-radius: var(--radius-md);
   font-size: var(--font-size-lg);
   font-weight: 700;
+  transition: background 0.2s cubic-bezier(0.19, 1, 0.22, 1),
+              transform 0.2s cubic-bezier(0.19, 1, 0.22, 1),
+              box-shadow 0.2s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .finishBtn:hover {
   background: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.25);
+}
+
+.finishBtn:active {
+  transform: translateY(0);
 }
 
 /* Summary */
 .summaryCard {
   background: var(--color-surface);
   border: 1px solid var(--color-gray-200);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   padding: var(--space-lg);
   margin-bottom: var(--space-lg);
+  animation: fadeIn 0.5s cubic-bezier(0.19, 1, 0.22, 1) both;
 }
 
 .summaryRow {
@@ -288,6 +357,7 @@
 
 .positive {
   color: var(--color-success);
+  font-weight: 600;
 }
 
 .neutral {
@@ -311,6 +381,7 @@
   background: var(--color-danger);
   border-radius: 12px 12px 0 0;
   opacity: 0.5;
+  transition: width 0.6s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .sudsBarAfter {
@@ -320,12 +391,13 @@
   height: 12px;
   background: var(--color-success);
   border-radius: 0 0 12px 12px;
+  transition: width 0.6s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .sudsBarLabels {
   display: flex;
   justify-content: space-between;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: var(--color-gray-400);
   margin-bottom: var(--space-xl);
 }
@@ -338,10 +410,13 @@
   color: white;
   border-radius: var(--radius-md);
   font-weight: 600;
+  transition: background 0.2s cubic-bezier(0.19, 1, 0.22, 1),
+              transform 0.2s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .journalLink:hover {
   background: var(--color-primary-dark);
+  transform: translateY(-1px);
 }
 
 .notFound {
@@ -357,4 +432,10 @@
   color: white;
   border: none;
   border-radius: var(--radius-md);
+  font-weight: 600;
+  transition: background 0.2s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.backBtn:hover {
+  background: var(--color-primary-dark);
 }

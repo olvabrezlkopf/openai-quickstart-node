@@ -47,8 +47,8 @@ export default function JournalPage() {
         <div className={styles.empty}>
           <p className={styles.emptyTitle}>Noch keine Einträge</p>
           <p className={styles.emptyHint}>
-            Tagebucheinträge entstehen nach jeder abgeschlossenen Exposition.
-            Plane eine Übung im Kalender und fülle nach dem Logger den Eintrag aus.
+            Tagebucheinträge entstehen nach jeder abgeschlossenen Challenge.
+            Plane eine Übung im Kalender und halte danach fest, was du erlebt hast.
           </p>
           <Link href="/calendar" className={styles.ctaBtn}>Zum Kalender</Link>
         </div>
@@ -76,7 +76,7 @@ export default function JournalPage() {
 
               {log && log.suds_before != null && log.suds_after != null && (
                 <div className={styles.sudsRow}>
-                  <span className={styles.sudsLabel}>SUDS:</span>
+                  <span className={styles.sudsLabel}>Anspannung:</span>
                   <span className={styles.sudsBefore}>{log.suds_before}</span>
                   <span className={styles.sudsArrow}>→</span>
                   <span className={styles.sudsAfter}>{log.suds_after}</span>
@@ -94,7 +94,7 @@ export default function JournalPage() {
               <div className={styles.entryFields}>
                 {journal.content?.was_gelernt && (
                   <div className={styles.field}>
-                    <div className={styles.fieldLabel}>Was mein Nervensystem gelernt hat</div>
+                    <div className={styles.fieldLabel}>Was ich über mich gelernt habe</div>
                     <div className={styles.fieldValue}>{journal.content.was_gelernt}</div>
                   </div>
                 )}

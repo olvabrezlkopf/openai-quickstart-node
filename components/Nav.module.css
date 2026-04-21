@@ -4,7 +4,9 @@
   left: 0;
   right: 0;
   height: var(--nav-height);
-  background: var(--color-bg);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-top: 1px solid var(--color-gray-200);
   display: flex;
   align-items: center;
@@ -24,12 +26,13 @@
   padding: var(--space-sm);
   color: var(--color-gray-400);
   font-size: var(--font-size-sm);
-  transition: color 0.15s;
+  transition: color 0.25s cubic-bezier(0.19, 1, 0.22, 1),
+              transform 0.25s cubic-bezier(0.19, 1, 0.22, 1);
   border-radius: var(--radius-sm);
 }
 
 .link:hover {
-  color: var(--color-gray-600);
+  color: var(--color-gray-700);
 }
 
 .active {
@@ -58,19 +61,23 @@
     height: 100vh;
     flex-direction: column;
     justify-content: flex-start;
-    padding: var(--space-lg) var(--space-md);
-    gap: var(--space-xs);
+    padding: var(--space-xl) var(--space-md);
+    gap: 2px;
     border-top: none;
-    border-right: 1px solid var(--color-gray-200);
+    border-right: 1px solid var(--color-gray-100);
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
   }
 
   .brand {
     display: block;
     font-size: var(--font-size-2xl);
-    font-weight: 700;
+    font-weight: 800;
     color: var(--color-primary);
-    margin-bottom: var(--space-xl);
-    padding-left: var(--space-sm);
+    margin-bottom: var(--space-2xl);
+    padding-left: var(--space-md);
+    letter-spacing: -0.02em;
   }
 
   .link {
@@ -78,7 +85,17 @@
     justify-content: flex-start;
     gap: var(--space-sm);
     width: 100%;
-    padding: var(--space-sm) var(--space-md);
+    padding: 10px var(--space-md);
+    border-radius: var(--radius-md);
+  }
+
+  .link:hover {
+    background: var(--color-gray-50);
+  }
+
+  .active {
+    background: rgba(79, 70, 229, 0.08);
+    color: var(--color-primary);
   }
 
   .icon {
@@ -87,6 +104,7 @@
   }
 
   .label {
-    font-size: var(--font-size-base);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
   }
 }

@@ -69,7 +69,7 @@ export default function LogPage() {
   if (!scheduled) {
     return (
       <div className={styles.notFound}>
-        <p>Exposition nicht gefunden.</p>
+        <p>Challenge nicht gefunden.</p>
         <button onClick={() => router.push('/calendar')} className={styles.backBtn}>Zum Kalender</button>
       </div>
     );
@@ -182,17 +182,17 @@ export default function LogPage() {
   if (isPrePhase) {
     return (
       <div>
-        <Head><title>Pre-Exposure — Mutig</title></Head>
+        <Head><title>Vor der Übung — Mutig</title></Head>
         <button className={styles.backLink} onClick={() => router.push('/calendar')}>← Kalender</button>
 
         <div className={styles.header}>
-          <span className={styles.phase}>Pre-Exposure</span>
-          <h1 className={styles.title}>{item?.title || 'Exposition'}</h1>
+          <span className={styles.phase}>Vor der Übung</span>
+          <h1 className={styles.title}>{item?.title || 'Challenge'}</h1>
           {item?.description && <p className={styles.desc}>{item.description}</p>}
         </div>
 
         <form onSubmit={handleStartLog} className={styles.form}>
-          <SudsSlider value={sudsBefore} onChange={setSudsBefore} label="Wie fühlst du dich jetzt? (SUDS)" />
+          <SudsSlider value={sudsBefore} onChange={setSudsBefore} label="Wie fühlst du dich gerade? (0 = entspannt, 10 = sehr angespannt)" />
           <label className={styles.formLabel}>
             Kurze Notiz (optional)
             <textarea
@@ -218,14 +218,14 @@ export default function LogPage() {
     if (editingPre) {
       return (
         <div>
-          <Head><title>Pre bearbeiten — Mutig</title></Head>
+          <Head><title>Werte anpassen — Mutig</title></Head>
           <button className={styles.backLink} onClick={() => setEditingPre(false)}>← Zurück</button>
           <div className={styles.header}>
-            <span className={styles.phase}>Pre bearbeiten</span>
-            <h1 className={styles.title}>{item?.title || 'Exposition'}</h1>
+            <span className={styles.phase}>Werte anpassen</span>
+            <h1 className={styles.title}>{item?.title || 'Challenge'}</h1>
           </div>
           <form onSubmit={handleEditPre} className={styles.form}>
-            <SudsSlider value={sudsBefore} onChange={setSudsBefore} label="SUDS vorher" />
+            <SudsSlider value={sudsBefore} onChange={setSudsBefore} label="Anspannung vorher" />
             <label className={styles.formLabel}>
               Notiz (optional)
               <textarea
@@ -246,17 +246,17 @@ export default function LogPage() {
 
     return (
       <div>
-        <Head><title>Post-Exposure — Mutig</title></Head>
+        <Head><title>Danach — Mutig</title></Head>
         <button className={styles.backLink} onClick={() => router.push('/calendar')}>← Kalender</button>
 
         <div className={styles.header}>
-          <span className={styles.phase}>Post-Exposure</span>
-          <h1 className={styles.title}>{item?.title || 'Exposition'}</h1>
+          <span className={styles.phase}>Danach</span>
+          <h1 className={styles.title}>{item?.title || 'Challenge'}</h1>
         </div>
 
         <div className={styles.infoCard}>
           <div className={styles.infoRow}>
-            <span>SUDS vorher</span>
+            <span>Anspannung vorher</span>
             <strong>{existingLog.suds_before}</strong>
           </div>
           {existingLog.note && (
@@ -275,7 +275,7 @@ export default function LogPage() {
         </div>
 
         <form onSubmit={handleFinishLog} className={styles.form}>
-          <SudsSlider value={sudsAfter} onChange={setSudsAfter} label="SUDS jetzt" />
+          <SudsSlider value={sudsAfter} onChange={setSudsAfter} label="Anspannung jetzt" />
           <div className={styles.toggleRow}>
             <span className={styles.toggleLabel}>Durchgehalten?</span>
             <button
@@ -304,13 +304,13 @@ export default function LogPage() {
 
         <div className={styles.header}>
           <span className={styles.phaseJournal}>Tagebucheintrag</span>
-          <h1 className={styles.title}>{item?.title || 'Exposition'}</h1>
+          <h1 className={styles.title}>{item?.title || 'Challenge'}</h1>
           <p className={styles.desc}>1 Satz reicht pro Feld — mehr braucht es nicht.</p>
         </div>
 
         <form onSubmit={handleSaveJournal} className={styles.form}>
           <label className={styles.formLabel}>
-            Was hat mein Nervensystem heute gelernt?
+            Was habe ich heute über mich gelernt?
             <textarea
               value={wasGelernt}
               onChange={(e) => setWasGelernt(e.target.value)}
@@ -375,20 +375,20 @@ export default function LogPage() {
 
       <div className={styles.header}>
         <span className={styles.phaseDone}>Abgeschlossen</span>
-        <h1 className={styles.title}>{item?.title || 'Exposition'}</h1>
+        <h1 className={styles.title}>{item?.title || 'Challenge'}</h1>
       </div>
 
       <div className={styles.summaryCard}>
         <div className={styles.summaryRow}>
-          <span>SUDS vorher</span>
+          <span>Anspannung vorher</span>
           <strong>{existingLog.suds_before}</strong>
         </div>
         <div className={styles.summaryRow}>
-          <span>SUDS nachher</span>
+          <span>Anspannung nachher</span>
           <strong>{existingLog.suds_after}</strong>
         </div>
         <div className={styles.summaryRow}>
-          <span>SUDS-Drop</span>
+          <span>Veränderung</span>
           <strong className={sudsDrop > 0 ? styles.positive : styles.neutral}>
             {sudsDrop > 0 ? `-${sudsDrop}` : sudsDrop}
           </strong>

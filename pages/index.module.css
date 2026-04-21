@@ -214,3 +214,40 @@
 .ctaButton:active {
   transform: translateY(0);
 }
+
+.demoButton {
+  display: block;
+  margin: var(--space-md) auto 0;
+  padding: var(--space-sm) var(--space-lg);
+  background: none;
+  border: 1px dashed var(--color-gray-300);
+  border-radius: var(--radius-md);
+  color: var(--color-gray-500);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  transition: all 0.25s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.demoButton:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: rgba(79, 70, 229, 0.04);
+}
+
+.demoBadge {
+  display: block;
+  margin: 0 auto var(--space-lg);
+  padding: var(--space-xs) var(--space-md);
+  background: none;
+  border: 1px dashed var(--color-gray-300);
+  border-radius: 99px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-gray-400);
+  transition: all 0.2s;
+}
+
+.demoBadge:hover {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}

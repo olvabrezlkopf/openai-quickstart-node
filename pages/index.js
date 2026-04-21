@@ -3,11 +3,13 @@ import Link from 'next/link';
 import { useMemo } from 'react';
 import styles from './index.module.css';
 import { useData } from '../context/DataContext';
+import { LOAD_STATE } from '../context/actions';
 import { calcStreak, calcCompletionRate, calcAvgSudsDrop } from '../lib/stats';
+import { getDemoState, DEMO_PLAN_ID } from '../lib/demoData';
 import MetricCard from '../components/MetricCard';
 
 export default function Dashboard() {
-  const { state, isHydrated } = useData();
+  const { state, dispatch, isHydrated } = useData();
 
   const streak = useMemo(() => calcStreak(state.scheduled), [state.scheduled]);
   const completionRate = useMemo(() => calcCompletionRate(state.scheduled), [state.scheduled]);
@@ -31,6 +33,47 @@ export default function Dashboard() {
   if (!isHydrated) return <div className={styles.skeleton} />;
 
   const hasData = Object.keys(state.scheduled).length > 0;
+  const hasDemo = !!state.plans[DEMO_PLAN_ID];
+
+  function loadDemo() {
+    const demo = getDemoState();
+    dispatch({
+      type: LOAD_STATE,
+      payload: {
+        ...state,
+        plans: { ...state.plans, ...demo.plans },
+        phases: { ...state.phases, ...demo.phases },
+        items: { ...state.items, ...demo.items },
+        scheduled: { ...state.scheduled, ...demo.scheduled },
+        logs: { ...state.logs, ...demo.logs },
+        journals: { ...state.journals, ...demo.journals },
+      },
+    });
+  }
+
+  function removeDemo() {
+    const strip = (map, check) => {
+      const out = {};
+      for (const [k, v] of Object.entries(map)) {
+        if (!check(v)) out[k] = v;
+      }
+      return out;
+    };
+    const demoItemIds = new Set(Object.keys(state.items).filter((k) => k.startsWith('demo-')));
+    const demoSchedIds = new Set(Object.keys(state.scheduled).filter((k) => k.startsWith('demo-')));
+    dispatch({
+      type: LOAD_STATE,
+      payload: {
+        ...state,
+        plans: strip(state.plans, (v) => v.id?.startsWith('demo-')),
+        phases: strip(state.phases, (v) => v.id?.startsWith('demo-')),
+        items: strip(state.items, (v) => v.id?.startsWith('demo-')),
+        scheduled: strip(state.scheduled, (v) => v.id?.startsWith('demo-')),
+        logs: strip(state.logs, (v) => v.id?.startsWith('demo-')),
+        journals: strip(state.journals, (v) => v.id?.startsWith('demo-')),
+      },
+    });
+  }
 
   return (
     <div>
@@ -60,6 +103,9 @@ export default function Dashboard() {
           <p className={styles.emptyTitle}>Willkommen bei Mutig</p>
           <p>Erstelle deinen ersten Trainingsplan und starte deine Reise.</p>
           <Link href="/plan" className={styles.ctaButton}>Ersten Plan erstellen</Link>
+          <button className={styles.demoButton} onClick={loadDemo}>
+            Demo-Projekt laden
+          </button>
         </div>
       ) : (
         <>
@@ -99,6 +145,12 @@ export default function Dashboard() {
                 Jetzt starten
               </Link>
             </div>
+          )}
+
+          {hasDemo && (
+            <button className={styles.demoBadge} onClick={removeDemo}>
+              Demo-Daten entfernen
+            </button>
           )}
 
           {recentActivity.length > 0 && (

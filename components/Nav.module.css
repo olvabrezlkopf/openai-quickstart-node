@@ -51,6 +51,21 @@
   font-size: 0.7rem;
 }
 
+.spacer {
+  display: none;
+}
+
+.settingsLink {
+  order: 99;
+}
+
+.avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
 /* Desktop sidebar */
 @media (min-width: 768px) {
   .nav {
@@ -106,5 +121,21 @@
   .label {
     font-size: var(--font-size-sm);
     font-weight: 500;
+  }
+
+  .spacer {
+    display: block;
+    flex: 1;
+  }
+
+  .settingsLink {
+    margin-top: auto;
+    border-top: 1px solid var(--color-gray-100);
+    padding-top: var(--space-md);
+  }
+
+  .avatar {
+    width: 28px;
+    height: 28px;
   }
 }

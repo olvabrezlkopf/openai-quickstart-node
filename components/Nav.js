@@ -1,11 +1,13 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { useSession } from 'next-auth/react';
 import {
   House,
   ListBullets,
   CalendarBlank,
   NotePencil,
   ChartLineUp,
+  GearSix,
 } from '@phosphor-icons/react';
 import styles from './Nav.module.css';
 
@@ -19,6 +21,10 @@ const NAV_ITEMS = [
 
 export default function Nav() {
   const router = useRouter();
+  const { data: session } = useSession();
+  const user = session?.user;
+
+  const settingsActive = router.pathname.startsWith('/settings');
 
   return (
     <nav className={styles.nav}>
@@ -40,6 +46,22 @@ export default function Nav() {
           </Link>
         );
       })}
+      <div className={styles.spacer} />
+      <Link
+        href="/settings"
+        className={`${styles.link} ${styles.settingsLink} ${settingsActive ? styles.active : ''}`}
+      >
+        {user?.image ? (
+          <img src={user.image} alt="" className={styles.avatar} />
+        ) : (
+          <span className={styles.icon}>
+            <GearSix size={22} weight={settingsActive ? 'fill' : 'regular'} />
+          </span>
+        )}
+        <span className={styles.label}>
+          {user?.name?.split(' ')[0] || 'Einstellungen'}
+        </span>
+      </Link>
     </nav>
   );
 }
